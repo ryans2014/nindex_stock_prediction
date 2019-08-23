@@ -1,0 +1,5 @@
+/data_extraction/venv
+/data_extraction/.idea
+/data_extraction/data_extractor/__pycache__
+/data_extraction/test/__pycache__
+/data_extraction/work_dir
