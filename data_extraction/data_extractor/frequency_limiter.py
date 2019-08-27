@@ -19,3 +19,4 @@ def frequency_limiter(interval_by_second: float):
         return wrapper_function
 
     return decorator_frequency_limiter
+

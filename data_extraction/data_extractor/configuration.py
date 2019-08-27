@@ -89,3 +89,5 @@ def init(config_file_name="data_extraction.config"):
     load_config_file()
     verify_and_apply_configurations()
 
+
+init()
