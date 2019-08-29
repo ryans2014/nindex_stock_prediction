@@ -1,6 +1,6 @@
 import requests
-from data_extractor.frequency_limiter import frequency_limiter
-from data_extractor.configuration import get_config
+from utility.frequency_limiter import frequency_limiter
+from configuration.configuration import get_config
 import logging
 
 

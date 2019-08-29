@@ -1,6 +1,6 @@
-from data_extractor.data_unit import StockData, DataType
-from data_extractor.date import date_to_int
-from data_extractor.log_and_discard_exceptions import log_and_discard_exceptions
+from utility.data_unit import StockData, DataType
+from utility.date import date_to_int
+from utility.log_and_discard_exceptions import log_and_discard_exceptions
 import logging
 
 

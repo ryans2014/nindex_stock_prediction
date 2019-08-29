@@ -1,4 +1,4 @@
-from data_extractor.frequency_limiter import frequency_limiter
+from utility.frequency_limiter import frequency_limiter
 from time import time
 import unittest
 

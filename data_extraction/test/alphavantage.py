@@ -1,4 +1,3 @@
-import data_extractor.configuration
 from data_extractor.alphavantage_extractor import AlphavantageExtractor
 import unittest
 

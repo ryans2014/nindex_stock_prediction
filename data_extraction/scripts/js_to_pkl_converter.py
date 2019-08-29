@@ -2,10 +2,9 @@ import os
 import glob
 import json
 import pickle
-from data_extractor.configuration import work_dir
-from data_extractor.data_unit import StockData
+from configuration.configuration import work_dir
 from data_extractor.alphavantage_data_processor import process_data_to_get_closing_price
-from data_extractor.log_and_discard_exceptions import log_and_discard_exceptions
+from utility.log_and_discard_exceptions import log_and_discard_exceptions
 
 
 # read json file, get closing price, stored to pkl file (binary)

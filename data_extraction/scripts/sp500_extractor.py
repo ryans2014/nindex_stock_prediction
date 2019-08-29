@@ -3,7 +3,7 @@ import os
 import json
 import logging
 from data_extractor.alphavantage_extractor import AlphavantageExtractor
-from data_extractor.log_and_discard_exceptions import log_and_discard_exceptions
+from utility.log_and_discard_exceptions import log_and_discard_exceptions
 
 
 # get sp500 data, store json file in work dir, skip if json file already exists
