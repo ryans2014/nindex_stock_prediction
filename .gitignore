@@ -3,5 +3,5 @@
 /data_extraction/data_extractor/__pycache__
 /data_extraction/test/__pycache__
 /data_extraction/work_dir/data_extractor.logging
-/data_extraction/work_dir/*.json
+/data_extraction/work_dir/sp500_data_raw_json
 /existing_projects
