@@ -1,11 +1,11 @@
-from data_extractor.alphavantage_extractor import AlphavantageExtractor
+from data_extractor import Extractor
 import sys
 import logging
 
 
 # test entrance
 def debug_entrance():
-    extractor = AlphavantageExtractor()
+    extractor = Extractor()
     return extractor.batch_extract(['AAPL'], True)
 
 

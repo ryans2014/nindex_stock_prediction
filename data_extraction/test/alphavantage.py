@@ -1,11 +1,11 @@
-from data_extractor.alphavantage_extractor import AlphavantageExtractor
+from data_extractor import Extractor
 import unittest
 
 
 class TestAlphavantageExtractor(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.extractor = AlphavantageExtractor()
+        self.extractor = Extractor()
 
     def test_valid_ticker(self):
         obj = self.extractor.batch_extract(['AAPL'], True)

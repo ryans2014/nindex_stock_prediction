@@ -1,17 +1,18 @@
+# This file is no longer being used
+
 import os
 import glob
 import json
 import pickle
-from configuration.configuration import work_dir
+from configuration import work_dir
 from data_extractor.alphavantage_data_processor import process_data_to_get_closing_price
-from utility.log_and_discard_exceptions import log_and_discard_exceptions
-
+import utility
 
 # read json file, get closing price, stored to pkl file (binary)
-@log_and_discard_exceptions
+@utility.log_and_discard_exceptions
 def convert_raw_json_to_pkl():
     json_path = os.path.join(work_dir, "sp500_data_raw_json\\*.json")
-    pkl_file_path = os.path.join(work_dir, "sp500_date_close_volume.pkl")
+    pkl_file_path = os.path.join(work_dir, "sp500_close_volume.pkl")
     data = {}
     for file in glob.glob(pathname=json_path, recursive=False):
         with open(file, 'r') as f:

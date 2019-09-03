@@ -2,14 +2,14 @@ import csv
 import os
 import json
 import logging
-from data_extractor.alphavantage_extractor import AlphavantageExtractor
-from utility.log_and_discard_exceptions import log_and_discard_exceptions
+import utility
+from data_extractor import Extractor
 
 
 # get sp500 data, store json file in work dir, skip if json file already exists
-@log_and_discard_exceptions
+@utility.log_and_discard_exceptions
 def get_sp500_full_history_raw_json_files():
-    extractor = AlphavantageExtractor()
+    extractor = Extractor()
     tickers = []
     path = os.getcwd()
     with open("sp500_list.csv", 'r') as csv_file:

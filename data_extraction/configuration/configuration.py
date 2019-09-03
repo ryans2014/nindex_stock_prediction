@@ -6,6 +6,7 @@ import inspect
 dict_format_config = {}
 src_dir = ""
 work_dir = ""
+debug_mode = False
 
 
 def get_config(key: str, sub_key: str = None):
@@ -70,12 +71,19 @@ def init(config_file_name="data_extraction.config"):
         work_dir = get_config("working dir")
         os.chdir(work_dir)
 
+        # debug mode
+        global debug_mode
+        debug_mode = get_config("debug mode")
+
         # log settings
-        log_file_name = "data_extractor.logging"
-        logging.basicConfig(level=log_level,
-                            filename=log_file_name,
-                            format='%(levelname)s: %(asctime)s %(message)s',
-                            datefmt='%m/%d %I:%M:%S')
+        if debug_mode:
+            logging.basicConfig(level=log_level)
+        else:
+            log_file_name = "data_extractor.logging"
+            logging.basicConfig(level=log_level,
+                                filename=log_file_name,
+                                format='%(levelname)s: %(asctime)s %(message)s',
+                                datefmt='%m/%d %I:%M:%S')
         logging.info("Configurations: %s" % dict_format_config)
         logging.info("Source directory: %s" % src_dir)
         logging.info("Working directory switched to %s" % work_dir)

@@ -1,6 +1,6 @@
 import requests
-from utility.frequency_limiter import frequency_limiter
-from configuration.configuration import get_config
+import utility
+from configuration import get_config
 import logging
 
 
@@ -25,7 +25,7 @@ class AlphavantageExtractor:
         return url_format % (fun, output_size, ticker, self._token)
 
     @staticmethod
-    @frequency_limiter(_cool_down_time)
+    @utility.frequency_limiter(_cool_down_time)
     def _get_eod_data(url: str):
         """
         :param url: url to get data
@@ -51,6 +51,9 @@ class AlphavantageExtractor:
         return data
 
     def batch_extract(self, ticker_list: list, get_full_data: bool) -> list:
+        """
+        returns a list of json-type dict object
+        """
         ret = []
         for ticker in ticker_list:
             data = self.extract(ticker, get_full_data)
@@ -58,6 +61,9 @@ class AlphavantageExtractor:
         return ret
 
     def extract(self, ticker: str, get_full_data: bool) -> dict:
+        """
+        returns a json-type dict object
+        """
         url = self._get_eod_query_url(ticker, get_full_data)
         return AlphavantageExtractor._get_eod_data(url)
 
