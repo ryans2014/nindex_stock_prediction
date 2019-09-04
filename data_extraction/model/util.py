@@ -28,3 +28,14 @@ def get_sma(np_arr, period_list):
 
 def price_to_percentage(np_arr):
     return (np_arr[1:] / np_arr[:-1] - 1) * 100
+
+
+def get_accuracy_matrix(trained_model, x_test, y_test, threshold: float):
+    y_predict = trained_model.predict(x_test).reshape(-1)
+    y_real = y_test.reshape(-1)
+    y_predict = (y_predict > threshold) + 1 - (y_predict < -threshold)
+    y_real = (y_real > 3.0) + 1 - (y_real < -3.0)
+    ret = np.zeros(shape=(3, 3), dtype=int)
+    for yp, yr in zip(y_predict, y_real):
+        ret[yp][yr] += 1
+    return ret
