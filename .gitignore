@@ -8,7 +8,5 @@
 /data_extraction/venv
 /data_extraction/.idea
 
-/data_extraction/work_dir/data_extractor.logging
-/data_extraction/work_dir/sp500_data_raw_json
-/data_extraction/work_dir/model_weights
+/data_extraction/work_dir
 /existing_projects

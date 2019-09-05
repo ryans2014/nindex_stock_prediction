@@ -1,4 +1,4 @@
-from model import get_batch_input_array
+from model.preprocessing import get_batch_input_array
 import unittest
 
 

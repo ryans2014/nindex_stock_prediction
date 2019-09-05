@@ -4,7 +4,7 @@ import json
 from configuration import work_dir
 import utility
 from data_extractor import convert_alphavantage_data_to_pandas
-from model.util import normalize, get_sma, price_to_percentage
+from model.math_util import normalize, get_sma, price_to_percentage
 import numpy as np
 import math
 import functools
@@ -51,9 +51,10 @@ def _get_expanded_data_frame(**kwargs):
         yield df
 
 
-def _get_input_array(sample_offset, input_length, dp_per_sma=4,
+def _get_input_array(sample_offset, input_length,
                      date_cutoff=-1, month_cutoff=-1, year_cutoff=-1,
                      **kwargs):
+    dp_per_sma = 4
 
     date_cutoff = max(date_cutoff, month_cutoff * 21, year_cutoff * 253)
     if date_cutoff < 1000:
@@ -70,45 +71,40 @@ def _get_input_array(sample_offset, input_length, dp_per_sma=4,
             start = idx - input_length - 1
             end = idx
             close = df["Close"][start:end].values
-            close = price_to_percentage(close)
-            # average_percentage = np.abs(close).mean()
-            # close = close / average_percentage
+            close = price_to_percentage(close) * 0.25
+            close = np.tanh(close)
 
             # sma5
             dp_interval = math.ceil(5.0 / dp_per_sma)
             start = idx - 1 - input_length * dp_interval
             end = idx
             sma5 = df["SMA5"][start:end:2].values
-            sma5 = price_to_percentage(sma5)
-            # average_percentage = np.abs(sma5).mean()
-            # sma5 = sma5 / average_percentage
+            sma5 = price_to_percentage(sma5) * 0.5 / 2.0
+            sma5 = np.tanh(sma5)
 
             # sma20
             dp_interval = math.ceil(20.0 / dp_per_sma)
             start = idx - 1 - input_length * dp_interval
             end = idx
             sma20 = df["SMA20"][start:end:5].values
-            sma20 = price_to_percentage(sma20)
-            # average_percentage = np.abs(sma20).mean()
-            # sma20 = sma20 / average_percentage
+            sma20 = price_to_percentage(sma20) / 5.0
+            sma20 = np.tanh(sma20)
 
             # sma100
             dp_interval = math.ceil(100.0 / dp_per_sma)
             start = idx - 1 - input_length * dp_interval
             end = idx
             sma100 = df["SMA100"][start:end:25].values
-            sma100 = price_to_percentage(sma100)
-            # average_percentage = np.abs(sma100).mean()
-            # sma100 = sma100 / average_percentage
+            sma100 = price_to_percentage(sma100) * 2.0 / 25.0
+            sma100 = np.tanh(sma100)
 
             # sma200
             dp_interval = math.ceil(200.0 / dp_per_sma)
             start = idx - 1 - input_length * dp_interval
             end = idx
             sma200 = df["SMA200"][start:end:50].values
-            sma200 = price_to_percentage(sma200)
-            # average_percentage = np.abs(sma200).mean()
-            # sma200 = sma200 / average_percentage
+            sma200 = price_to_percentage(sma200) * 2.5 / 50.0
+            sma200 = np.tanh(sma200)
 
             # combine matrix
             close.reshape(-1, 1)
@@ -121,7 +117,10 @@ def _get_input_array(sample_offset, input_length, dp_per_sma=4,
             # get target
             sma20_future = df["SMA20"][idx + 19]
             price_now = df["Close"][idx - 1]
-            y = (sma20_future / price_now - 1.0) * 100
+            y = (sma20_future / price_now - 1.0) * 100.0
+
+            # mapping to around (-2, 2) region
+            y = np.tanh(y / 10.0)
 
             # check shape and nan
             if x_array.shape != (input_length, 5):

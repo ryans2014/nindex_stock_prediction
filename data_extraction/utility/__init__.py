@@ -12,3 +12,4 @@ from utility import date
 from utility.frequency_limiter import frequency_limiter
 from utility.log_and_discard_exceptions import log_and_discard_exceptions
 from utility.batch_execution import batch_execution
+from utility.single_instance_generator import single_instance_generator
