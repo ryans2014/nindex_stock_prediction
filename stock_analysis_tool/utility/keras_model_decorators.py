@@ -1,9 +1,6 @@
 import functools
 
 
-_keras_model_function_map = {}
-
-
 def named_model(fun):
     """
     :param fun: function to generate keras models. Need to return a keras model.
@@ -17,7 +14,6 @@ def named_model(fun):
         model.cname = model_name
         return model
 
-    _keras_model_function_map[fun.__name__] = fun
     return call_and_set_cname
 
 
@@ -33,7 +29,3 @@ def multi_input_model(fun):
         return model
 
     return call_and_set_flag
-
-
-def make_keras_model_by_name(name):
-    return _keras_model_function_map[name]()

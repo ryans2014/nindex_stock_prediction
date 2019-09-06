@@ -1,5 +1,4 @@
-from models import get_batch_input_array
-from models.keras_model_utility import load
+import models
 import numpy as np
 import matplotlib.pyplot as plt
 import utility
@@ -16,14 +15,12 @@ def plot_prediction(keras_model, ticker="AAPL", num_year=5, threshold=0.03):
 
     if type(keras_model).__name__ == "function":
         keras_model = keras_model()
-    elif type(keras_model) is str:
-        keras_model = utility.make_keras_model_by_name(keras_model)
 
     # load model
-    load(keras_model)
+    models.load(keras_model)
 
     # get data
-    xx, yy, date, price = next(get_batch_input_array(-1, 1, 20, year_cutoff=num_year, single_ticker=ticker))
+    xx, yy, date, price = next(models.get_batch_input_array(-1, 1, 20, year_cutoff=num_year, single_ticker=ticker))
 
     # predict and transform (tanh -> percentage -> ratio)
     yp = keras_model.predict(xx)
@@ -38,12 +35,11 @@ def plot_prediction(keras_model, ticker="AAPL", num_year=5, threshold=0.03):
     predict_change.reverse()
 
     # plot
-    plt.plot(date, price)
-    ax = plt.axes()
+    plt.plot(date, price, color='k')
     for x, y, dy in zip(date, price, predict_change):
         if dy / y > threshold:
-            ax.arrow(x, y, 0.0, dy, color='r')
+            plt.arrow(x, y, 0.0, dy, color='r')
         elif dy / y < -threshold:
-            ax.arrow(x, y, 0.0, dy, color='b')
+            plt.arrow(x, y, 0.0, dy, color='b')
         else:
-            ax.arrow(x, y, 0.0, dy, color='y')
+            plt.arrow(x, y, 0.0, dy, color='y')

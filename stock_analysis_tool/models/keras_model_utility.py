@@ -22,16 +22,15 @@ def next_color():
             yield color
 
 
-def get_accuracy_matrix(trained_model, x_test, y_test, threshold: float):
+def get_accuracy_matrix(y_predict, y_real, threshold: float):
     """
-    :param trained_model: keras model
-    :param x_test: ndarray
-    :param y_test: ndarray, real data
+    :param y_predict: ndarray
+    :param y_real: ndarray, real data
     :param threshold: the prediction will be categorized into 3 groups: [-inf ... -threhold ... +threhold ... +inf]
     :return: a 3x3 2d list. axis-0 is the predicted result, axis-1 is y_test result
     """
-    y_predict = trained_model.predict(x_test).reshape(-1)
-    y_real = y_test.reshape(-1)
+    y_predict = y_predict.reshape(-1)
+    y_real = y_real.reshape(-1)
     y_predict = (y_predict > threshold) + 1 - (y_predict < -threshold)
     y_real = (y_real > threshold) + 1 - (y_real < -threshold)
     ret = np.zeros(shape=(3, 3), dtype=int)
@@ -140,7 +139,7 @@ def train(model, epochs, x_train, x_test, y_train, y_test, save_weight=False):
     return history
 
 
-def evaluate(models, xx, yy, output_file_name=None, cutoff=5.0):
+def evaluate(models, ypred, yreal, output_file_name=None, cutoff=5.0):
     """
     Evaluate model by 3x3 accuracy matrix. +cutoff and -cutoff are separation point to get the three ranges
     Cutoff unit is in percentage, different from unit of yy. YY is between (-1, 1).
@@ -150,9 +149,11 @@ def evaluate(models, xx, yy, output_file_name=None, cutoff=5.0):
 
     if type(models) is not list:
         models = [models]
+        ypred = [ypred]
+        yreal = [yreal]
 
-    for model in models:
-        mat = get_accuracy_matrix(model, xx, yy, cutoff)
+    for model, yp, yr in zip(models, ypred, yreal):
+        mat = get_accuracy_matrix(yp, yr, cutoff)
         score1 = mat[0][0] + mat[2][2] - mat[2][0] - mat[0][2]
         score1 = float(score1) / float(sum(mat[0]) + sum(mat[2]))
         score2 = sum(mat[i][i] for i in range(3)) - mat[2][0] - mat[0][2]
