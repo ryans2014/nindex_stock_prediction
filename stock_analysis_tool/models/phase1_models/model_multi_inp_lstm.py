@@ -1,8 +1,9 @@
 import tensorflow as tf
-from model.model_util import attach_model_cname
+import utility
 
 
-@attach_model_cname
+@utility.multi_input_model
+@utility.named_model
 def lstm_multi_input_v1_basic():
 
     def get_submodel():
@@ -29,7 +30,8 @@ def lstm_multi_input_v1_basic():
     return model
 
 
-@attach_model_cname
+@utility.multi_input_model
+@utility.named_model
 def lstm_multi_input_v1_larger_lstm():
 
     def get_submodel():
@@ -56,7 +58,8 @@ def lstm_multi_input_v1_larger_lstm():
     return model
 
 
-@attach_model_cname
+@utility.multi_input_model
+@utility.named_model
 def lstm_multi_input_v1_bidirection():
 
     def get_submodel():

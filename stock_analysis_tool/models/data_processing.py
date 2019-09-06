@@ -1,18 +1,21 @@
 import os
 import glob
 import json
-from configuration import work_dir
-import utility
-from data_extractor import convert_alphavantage_data_to_pandas
-from model.math_util import normalize, get_sma, price_to_percentage
-import numpy as np
 import math
 import functools
 import logging
+import numpy as np
+import utility
+from configuration import work_dir
+from data_extractor import convert_alphavantage_data_to_pandas
 
 
 @utility.log_and_discard_exceptions
 def _get_raw_json(endless=False):
+    """
+    Generator function for raw json object containing history date of 1 stock
+    If endless = True, never stops
+    """
     json_path = os.path.join(work_dir, "sp500_data_raw_json\\*.json")
     while True:
         for file in glob.glob(pathname=json_path, recursive=False):
@@ -24,24 +27,30 @@ def _get_raw_json(endless=False):
 
 
 def _get_original_data_frame(**kwargs):
+    """
+    Generator function for pandas DataFrame containing history date of 1 stock
+    """
     for raw_js_obj in _get_raw_json(**kwargs):
         _, df = convert_alphavantage_data_to_pandas(raw_js_obj)
         yield df
 
 
 def _get_expanded_data_frame(**kwargs):
+    """
+    Generator function for pandas DataFrame containing history date of 1 stock
+    Data is expanded to includes various SMA
+    """
     for df in _get_original_data_frame(**kwargs):
         if len(df) < 500:
             continue
-
         # log + normalize volume data
         # df["Volume"] = df["Volume"].map(np.log)
-        # df["Volume"] = normalize(df["Volume"].values)
+        # df["Volume"] = utility.math_functions.normalize(df["Volume"].values)
 
         # add sma
         sma_length = [5, 20, 100, 200]
         price = df["Close"].values
-        sma_price = get_sma(price, sma_length)
+        sma_price = utility.math_functions.get_sma(price, sma_length)
         df["SMA5"] = sma_price[0]
         df["SMA20"] = sma_price[1]
         df["SMA100"] = sma_price[2]
@@ -54,6 +63,12 @@ def _get_expanded_data_frame(**kwargs):
 def _get_input_array(sample_offset, input_length,
                      date_cutoff=-1, month_cutoff=-1, year_cutoff=-1,
                      **kwargs):
+    """
+    Generator function to generate fixed size ndarray
+    Parameter explanation is under function get_batch_input_array
+    Data normalization/regularization/clean-up are performed here.
+    Price to Percentage transformation is done here.
+    """
     dp_per_sma = 4
 
     date_cutoff = max(date_cutoff, month_cutoff * 21, year_cutoff * 253)
@@ -71,7 +86,7 @@ def _get_input_array(sample_offset, input_length,
             start = idx - input_length - 1
             end = idx
             close = df["Close"][start:end].values
-            close = price_to_percentage(close) * 0.25
+            close = utility.math_functions.price_to_percentage(close) * 0.25
             close = np.tanh(close)
 
             # sma5
@@ -79,7 +94,7 @@ def _get_input_array(sample_offset, input_length,
             start = idx - 1 - input_length * dp_interval
             end = idx
             sma5 = df["SMA5"][start:end:2].values
-            sma5 = price_to_percentage(sma5) * 0.5 / 2.0
+            sma5 = utility.math_functions.price_to_percentage(sma5) * 0.5 / 2.0
             sma5 = np.tanh(sma5)
 
             # sma20
@@ -87,7 +102,7 @@ def _get_input_array(sample_offset, input_length,
             start = idx - 1 - input_length * dp_interval
             end = idx
             sma20 = df["SMA20"][start:end:5].values
-            sma20 = price_to_percentage(sma20) / 5.0
+            sma20 = utility.math_functions.price_to_percentage(sma20) / 5.0
             sma20 = np.tanh(sma20)
 
             # sma100
@@ -95,7 +110,7 @@ def _get_input_array(sample_offset, input_length,
             start = idx - 1 - input_length * dp_interval
             end = idx
             sma100 = df["SMA100"][start:end:25].values
-            sma100 = price_to_percentage(sma100) * 2.0 / 25.0
+            sma100 = utility.math_functions.price_to_percentage(sma100) * 2.0 / 25.0
             sma100 = np.tanh(sma100)
 
             # sma200
@@ -103,7 +118,7 @@ def _get_input_array(sample_offset, input_length,
             start = idx - 1 - input_length * dp_interval
             end = idx
             sma200 = df["SMA200"][start:end:50].values
-            sma200 = price_to_percentage(sma200) * 2.5 / 50.0
+            sma200 = utility.math_functions.price_to_percentage(sma200) * 2.5 / 50.0
             sma200 = np.tanh(sma200)
 
             # combine matrix
@@ -167,13 +182,3 @@ def get_batch_input_array(batch_size, sample_offset, input_length=20, **kwargs):
         x_array = np.concatenate(tuple(x_list))
         y_array = np.array(y_list).reshape(-1, 1)
         yield x_array, y_array
-
-
-def batch_generator_creator(batch_size, sample_offset, **kwargs):
-    """
-    :return: generator function get_batch_input_array with given inputs
-    """
-    fun = functools.partial(get_batch_input_array, batch_size, sample_offset, **kwargs)
-    fun = functools.wraps(get_batch_input_array)(fun)
-    return fun
-

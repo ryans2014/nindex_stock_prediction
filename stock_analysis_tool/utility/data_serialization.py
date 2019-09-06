@@ -1,5 +1,5 @@
 import pickle
-from utility.log_and_discard_exceptions import log_and_discard_exceptions
+from utility.generic_exception_handler import log_and_discard_exceptions
 
 
 @log_and_discard_exceptions

@@ -1,8 +1,8 @@
 import tensorflow as tf
-from model.model_util import attach_model_cname
+import utility
 
 
-@attach_model_cname
+@utility.named_model
 def mlp_v1_basic():
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.Flatten(input_shape=(20, 5)))
@@ -17,7 +17,7 @@ def mlp_v1_basic():
     return model
 
 
-@attach_model_cname
+@utility.named_model
 def mlp_v1_basic_dropout():
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.Flatten(input_shape=(20, 5)))
@@ -33,7 +33,7 @@ def mlp_v1_basic_dropout():
     return model
 
 
-@attach_model_cname
+@utility.named_model
 def mlp_v1_basic_fat():
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.Flatten(input_shape=(20, 5)))

@@ -1,8 +1,8 @@
 import tensorflow as tf
-from model.model_util import attach_model_cname
+import utility
 
 
-@attach_model_cname
+@utility.named_model
 def lstm_v1_mse_rmsprop():
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.LSTM(5, input_shape=(20, 5)))
@@ -15,7 +15,7 @@ def lstm_v1_mse_rmsprop():
     return model
 
 
-@attach_model_cname
+@utility.named_model
 def lstm_v1_mse_adam():
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.LSTM(5, input_shape=(20, 5)))
@@ -28,7 +28,7 @@ def lstm_v1_mse_adam():
     return model
 
 
-@attach_model_cname
+@utility.named_model
 def lstm_v1_mae_adam():
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.LSTM(5, input_shape=(20, 5)))
@@ -41,7 +41,7 @@ def lstm_v1_mae_adam():
     return model
 
 
-@attach_model_cname
+@utility.named_model
 def lstm_v2_stack2():
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.LSTM(5, input_shape=(20, 5), return_sequences=True))
@@ -56,7 +56,7 @@ def lstm_v2_stack2():
     return model
 
 
-@attach_model_cname
+@utility.named_model
 def lstm_v2_stack2_dense_connect():
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.LSTM(5, input_shape=(20, 5), return_sequences=True))

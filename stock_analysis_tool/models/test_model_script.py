@@ -1,8 +1,5 @@
-from model.model_util import *
-from model.model_lstm import lstm_v1, lstm_v2
-from model.model_mlp import mlp_v1
-from model.model_multi_inp_cnn import cnn_v1
-from model.model_multi_inp_lstm import lstm_multi_v1
+from models.keras_model_utility import *
+from phase1_models.model_multi_inp_lstm import lstm_multi_v1
 
 
 def compare_list_of_models(model_functions, comparison_name):
@@ -25,11 +22,4 @@ def compare_list_of_models(model_functions, comparison_name):
     evaluate(model_list, x_test, y_test, comparison_name, cutoff=5.0)
 
 
-def load_model(model_obj):
-    md2 = model_obj()
-    load(md2)
-    return md2
-
-
 compare_list_of_models(lstm_multi_v1, "lstm_multi_v1")
-
