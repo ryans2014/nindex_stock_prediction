@@ -1,25 +1,28 @@
+import configuration
 from models.keras_model_utility import *
-from phase1_models.model_multi_inp_lstm import lstm_multi_v1
+from models.test_iteration3 import test_iteration3 as model_functions
 
+comparison_name = "test_iteration3"
 
-def compare_list_of_models(model_functions, comparison_name):
-    # get data
-    x_train, x_test, y_train, y_test = get_data(load_from_file=True, separate_input=True)
+# check if multiple input pipes
+separate_x = False
+if hasattr(model_functions[0](), "multi_input"):
+    separate_x = True
 
-    # run all models
-    hist_list = []
-    model_list = []
-    for my_model in model_functions:
-        md1 = my_model()
-        print("Working on model %s..." % md1.cname)
-        history = train(md1, 500, x_train, x_test, y_train, y_test)
-        hist_list.append(history)
-        model_list.append(md1)
-        save(md1)
+# get data
+x_train, x_test, y_train, y_test = get_data(load_from_file=True, separate_input=separate_x)
 
-    # evaluate and plot
-    plot_history(hist_list, model_list, comparison_name)
-    evaluate(model_list, x_test, y_test, comparison_name, cutoff=5.0)
+# run all models
+hist_list = []
+model_list = []
+for my_model in model_functions:
+    md1 = my_model()
+    print("Working on model %s..." % md1.cname)
+    history = train(md1, 5000, x_train, x_test, y_train, y_test)
+    hist_list.append(history)
+    model_list.append(md1)
+    save(md1, save_model=True)
 
-
-compare_list_of_models(lstm_multi_v1, "lstm_multi_v1")
+# evaluate and plot
+plot_history(hist_list, model_list, comparison_name)
+evaluate(model_list, x_test, y_test, comparison_name, cutoff=5.0)

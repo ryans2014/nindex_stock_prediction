@@ -2,7 +2,6 @@ import os
 import glob
 import json
 import math
-import functools
 import logging
 import numpy as np
 import utility
@@ -11,11 +10,21 @@ from data_extractor import convert_alphavantage_data_to_pandas
 
 
 @utility.log_and_discard_exceptions
-def _get_raw_json(endless=False):
+def _get_raw_json(endless=False, single_ticker=None):
     """
     Generator function for raw json object containing history date of 1 stock
     If endless = True, never stops
+    If single_ticker is set, only yield that
     """
+    if type(single_ticker) is str:
+        if not single_ticker.endswith("json"):
+            single_ticker = single_ticker + ".json"
+        file = os.path.join(os.path.join(work_dir, "sp500_data_raw_json"), single_ticker)
+        with open(file, 'r') as f:
+            raw_obj = json.load(f)
+            yield raw_obj
+        return
+
     json_path = os.path.join(work_dir, "sp500_data_raw_json\\*.json")
     while True:
         for file in glob.glob(pathname=json_path, recursive=False):
@@ -62,7 +71,7 @@ def _get_expanded_data_frame(**kwargs):
 
 def _get_input_array(sample_offset, input_length,
                      date_cutoff=-1, month_cutoff=-1, year_cutoff=-1,
-                     **kwargs):
+                     single_ticker=None, **kwargs):
     """
     Generator function to generate fixed size ndarray
     Parameter explanation is under function get_batch_input_array
@@ -77,9 +86,12 @@ def _get_input_array(sample_offset, input_length,
 
     max_offset = math.ceil(200.0 / dp_per_sma)
     max_size = input_length * max_offset + 1
-    for df in _get_expanded_data_frame(**kwargs):
+    for df in _get_expanded_data_frame(single_ticker=single_ticker, **kwargs):
         # target is the average price change in future 20 days
-        idx = len(df) - 20
+        if type(single_ticker) is str:
+            idx = len(df)
+        else:
+            idx = len(df) - 20
 
         while idx > max_size:
             # daily price
@@ -130,8 +142,11 @@ def _get_input_array(sample_offset, input_length,
                                       sma200.reshape(-1, 1)), axis=1)
 
             # get target
-            sma20_future = df["SMA20"][idx + 19]
+            sma20_future = -1.0
+            if idx + 19 < len(df):
+                sma20_future = df["SMA20"][idx + 19]
             price_now = df["Close"][idx - 1]
+            date_now = df["Date"][idx - 1]
             y = (sma20_future / price_now - 1.0) * 100.0
 
             # mapping to around (-2, 2) region
@@ -145,7 +160,7 @@ def _get_input_array(sample_offset, input_length,
             elif y == np.nan:
                 logging.error("y = NAN")
             else:
-                yield x_array, y
+                yield x_array, y, date_now, price_now
 
             # next
             idx -= sample_offset
@@ -163,22 +178,33 @@ def get_batch_input_array(batch_size, sample_offset, input_length=20, **kwargs):
                 date_cutoff: int, only consider the recent _ days of data
                 month_cutoff, year_cutoff: int, similiar
                 endless: bool
+                single_ticker: str, if you only want to get a single stock, set this
     :return: yield a tuple (x_array, y_array) as batch data
         x_array.shape = (batch_size, 20, 5)
         y_array.shape = (batch_size, 1)
     """
     x_list = []
     y_list = []
-    for x1, y1 in _get_input_array(sample_offset, input_length, **kwargs):
+    date_list = []
+    price_list = []
+    for x1, y1, dt, price in _get_input_array(sample_offset, input_length, **kwargs):
         x_list.append(x1.reshape((1, x1.shape[0], x1.shape[1])))
         y_list.append(y1)
+        date_list.append(dt)
+        price_list.append(price)
         if len(y_list) == batch_size:
             x_array = np.concatenate(tuple(x_list))
             y_array = np.array(y_list).reshape(-1, 1)
+            date_array = np.array(date_list).reshape(-1, 1)
+            price_array = np.array(price_list).reshape(-1, 1)
             x_list.clear()
             y_list.clear()
-            yield x_array, y_array
+            date_list.clear()
+            price_list.clear()
+            yield x_array, y_array, date_array, price_array
     if batch_size < 0:
         x_array = np.concatenate(tuple(x_list))
         y_array = np.array(y_list).reshape(-1, 1)
-        yield x_array, y_array
+        date_array = np.array(date_list).reshape(-1, 1)
+        price_array = np.array(price_list).reshape(-1, 1)
+        yield x_array, y_array, date_array, price_array

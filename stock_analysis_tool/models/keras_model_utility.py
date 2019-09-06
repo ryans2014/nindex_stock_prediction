@@ -77,7 +77,7 @@ def get_data(load_from_file=False, separate_input=False):
                       x_test[:, :, 4:5]]
         return x_train, x_test, y_train, y_test
 
-    x_total, y_total = next(get_batch_input_array(batch_size=-1, sample_offset=5, year_cutoff=20))
+    x_total, y_total, _, _ = next(get_batch_input_array(batch_size=-1, sample_offset=5, year_cutoff=20))
     x_train, x_test, y_train, y_test = train_test_split(x_total, y_total, test_size=0.2, random_state=123)
     with open("x_train.pk", "wb") as fp:
         pk.dump(x_train, fp)
@@ -103,12 +103,16 @@ def get_data(load_from_file=False, separate_input=False):
     return x_train, x_test, y_train, y_test
 
 
-def save(model):
+def save(model, save_model=False):
     """
     Save weight parameters with model name (from model.cname, set by @named_model decorator)
     """
     weight_file = "model_weights\\" + model.cname
     model.save_weights(weight_file)
+    if save_model:
+        model_file = weight_file + ".h5"
+        model.save(model_file)
+    return model
 
 
 def load(model):
@@ -117,41 +121,53 @@ def load(model):
     """
     weight_file = "model_weights\\" + model.cname
     model.load_weights(weight_file)
+    return model
 
 
 def train(model, epochs, x_train, x_test, y_train, y_test, save_weight=False):
 
-    # cb1 = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=20)
+    cb1 = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=20)
     history = model.fit(x_train,
                         y_train,
                         epochs=epochs,
-                        batch_size=1500,
+                        batch_size=3000,
                         validation_data=(x_test, y_test),
                         use_multiprocessing=True,
                         verbose=1)
-    # par callbacks = [cb1, cb2],
+    # callbacks=[cb1]
     if save_weight:
         save(model)
     return history
 
 
-def evaluate(models, xx, yy, output_file_name, cutoff=5.0):
+def evaluate(models, xx, yy, output_file_name=None, cutoff=5.0):
     """
     Evaluate model by 3x3 accuracy matrix. +cutoff and -cutoff are separation point to get the three ranges
     Cutoff unit is in percentage, different from unit of yy. YY is between (-1, 1).
         Cutoff_in_YY_unit = tanh(Cutoff * 0.1)
     """
+    cutoff = math.tanh(cutoff * 0.1)
+
     if type(models) is not list:
         models = [models]
-    cutoff = math.tanh(cutoff * 0.1)
-    with open(output_file_name + ".txt", "w") as fp:
-        for model in models:
-            fp.write("Model name: %s \n\n" % model.cname)
-            accuracy_matrix = get_accuracy_matrix(model, xx, yy, cutoff)
-            score = accuracy_matrix[0][0] + accuracy_matrix[2][2] - accuracy_matrix[2][0] - accuracy_matrix[0][2]
-            score = float(score) / float(sum(accuracy_matrix[0]) + sum(accuracy_matrix[2]))
-            fp.write(str(accuracy_matrix))
-            fp.write("\n\nScore = %f \n\n\n\n" % score)
+
+    for model in models:
+        mat = get_accuracy_matrix(model, xx, yy, cutoff)
+        score1 = mat[0][0] + mat[2][2] - mat[2][0] - mat[0][2]
+        score1 = float(score1) / float(sum(mat[0]) + sum(mat[2]))
+        score2 = sum(mat[i][i] for i in range(3)) - mat[2][0] - mat[0][2]
+        score2 = float(score2) - 0.2 * (mat[0][1] + mat[1][0] + mat[1][2] + mat[2][1])
+        score2 = score2 / float(sum(sum(mat[i]) for i in range(3)))
+        if output_file_name is not None:
+            with open(output_file_name + ".txt", "a") as fp:
+                fp.write("Model name: %s \n\n" % model.cname)
+                fp.write(str(mat))
+                fp.write("\n\nScore1 = %f \n" % score1)
+                fp.write("Score2 = %f \n\n\n\n" % score2)
+        else:
+            print(mat)
+            print(score1)
+            print(score2)
 
 
 def plot_history(history, models, name=""):
