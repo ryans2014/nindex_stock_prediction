@@ -52,7 +52,7 @@ class DataPreprocessor:
                 raw_obj = json.load(f)
                 self._dataframe = [DataPreprocessor._js_2_dataframe(raw_obj)]
             return self
-        json_path = os.path.join(os.path.join(work_dir, _raw_json_folder_name), "*.json")
+        json_path = os.path.join(os.path.join(work_dir, DataPreprocessor._raw_json_folder_name), "*.json")
         self._dataframe = []
         for file in glob.glob(pathname=json_path, recursive=False):
             with open(file, 'r') as f:
@@ -69,7 +69,7 @@ class DataPreprocessor:
         with open(csv_path, "r") as fp:
             cr = csv.reader(fp)
             for line in cr:
-                fname = os.path.join(os.path.join(work_dir, _raw_json_folder_name), line[0] + ".json")
+                fname = os.path.join(os.path.join(work_dir, DataPreprocessor._raw_json_folder_name), line[0] + ".json")
                 if not os.path.isfile(fname):
                     continue
                 with open(fname, 'r') as f:
