@@ -1,7 +1,7 @@
 from models.keras_model_utility import *
-from models.phase2_models.test_iteration3 import test_iteration3 as model_functions
+from models.test_iteration4 import test_iteration4 as model_functions
 
-comparison_name = "test_iteration3"
+comparison_name = "test_iteration4"
 
 # run all models
 hist_list = []
@@ -22,7 +22,7 @@ for my_model in model_functions:
     x_train, x_test, y_train, y_test = get_data(load_from_file=True, separate_input=separate_x)
 
     # train
-    history = train(md1, 5000, x_train, x_test, y_train, y_test)
+    history = train(md1, 1500, x_train, x_test, y_train, y_test)
 
     hist_list.append(history)
     model_list.append(md1)

@@ -129,7 +129,7 @@ def train(model, epochs, x_train, x_test, y_train, y_test, save_weight=False):
     history = model.fit(x_train,
                         y_train,
                         epochs=epochs,
-                        batch_size=3000,
+                        batch_size=2000,
                         validation_data=(x_test, y_test),
                         use_multiprocessing=True,
                         verbose=1)

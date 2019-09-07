@@ -3,6 +3,7 @@ import glob
 import json
 import math
 import logging
+import csv
 import numpy as np
 import utility
 from configuration import work_dir
@@ -33,6 +34,19 @@ def _get_raw_json(endless=False, single_ticker=None):
                 yield raw_obj
         if not endless:
             break
+
+
+@utility.log_and_discard_exceptions
+def _get_raw_json_from_csv():
+    with open("pop_stk.csv", "r") as fp:
+        cr = csv.reader(fp)
+        for line in cr:
+            fname = os.path.join(os.path.join(work_dir, "sp500_data_raw_json"), line[0] + ".json")
+            if not os.path.isfile(fname):
+                continue
+            with open(fname, 'r') as f:
+                raw_obj = json.load(f)
+                yield raw_obj
 
 
 def _get_original_data_frame(**kwargs):

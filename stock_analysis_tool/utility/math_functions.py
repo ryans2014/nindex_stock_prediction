@@ -10,15 +10,14 @@ def normalize(np_arr):
     return StandardScaler(copy=False).fit_transform(np_arr.reshape(-1, 1)).reshape(-1)
 
 
-def get_sma(np_arr, period_list):
+def get_sma(np_arr):
     """
     :param np_arr: 1d np array
-    :param period_list: list of int, moving average period
     :return: list of ndarray with same size, pad NAN in front
     """
     cum = np.cumsum(np_arr)
     ret = []
-    for period in period_list:
+    for period in (5, 20, 100, 200):
         sma_array = (cum[period:] - cum[:-period]) / float(period)
         nan_array = np.full(period, np.nan)
         full_array = np.concatenate((nan_array, sma_array))
