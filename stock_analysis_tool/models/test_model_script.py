@@ -1,6 +1,7 @@
 from models.keras_model_utility import *
-from models.test_iteration4 import test_iteration4 as model_functions
+from models import DataPreprocessor
 
+from models.models_version_4 import test_iteration4 as model_functions
 comparison_name = "test_iteration4"
 
 # run all models
@@ -19,7 +20,12 @@ for my_model in model_functions:
         separate_x = md1.multi_input
 
     # get data
-    x_train, x_test, y_train, y_test = get_data(load_from_file=True, separate_input=separate_x)
+    ret = DataPreprocessor().load_from_raw_json()\
+                            .expand()\
+                            .extract_sequence(year_cutoff=15)\
+                            .split()\
+                            .get(separate_input=separate_x)
+    x_train, x_test, y_train, y_test = ret
 
     # train
     history = train(md1, 1500, x_train, x_test, y_train, y_test)

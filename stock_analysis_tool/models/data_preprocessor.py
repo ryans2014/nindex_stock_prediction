@@ -7,8 +7,7 @@ import csv
 import numpy as np
 import utility
 import pickle as pk
-from configuration import work_dir
-from data_extractor import convert_alphavantage_data_to_pandas
+from data_extractor import get_data
 from sklearn.model_selection import train_test_split
 
 
@@ -24,8 +23,7 @@ class DataPreprocessor:
         x_train, y_train, x_test, y_test = DataProcessor()(ticker="name") to get single ticker for plotting
 
     """
-
-    _raw_json_folder_name = "sp500_data_raw_json"
+    _cache_folder_name = "raw_json_cache"
 
     def __init__(self):
         self._dataframe = []
@@ -38,6 +36,7 @@ class DataPreprocessor:
         self._date = []
         self._price_now = []
 
+    @utility.log_and_discard_exceptions
     def load_from_raw_json(self, single_ticker=None):
         """
         :param single_ticker: str, ticker of the stock you need
@@ -45,21 +44,20 @@ class DataPreprocessor:
         """
         if type(single_ticker) is str:
             self._single_ticker_call = True
-            if not single_ticker.endswith("json"):
-                single_ticker = single_ticker + ".json"
-            file = os.path.join(os.path.join(work_dir, DataPreprocessor._raw_json_folder_name), single_ticker)
-            with open(file, 'r') as f:
-                raw_obj = json.load(f)
-                self._dataframe = [DataPreprocessor._js_2_dataframe(raw_obj)]
+            if single_ticker.endswith("json"):
+                single_ticker = single_ticker[:-5]
+            _, df = get_data(ticker=single_ticker, force_update=False, save=True)
+            self._dataframe = [df]
             return self
-        json_path = os.path.join(os.path.join(work_dir, DataPreprocessor._raw_json_folder_name), "*.json")
+        json_path = os.path.join(os.path.join(os.getcwd(), DataPreprocessor._cache_folder_name), "*.json")
         self._dataframe = []
-        for file in glob.glob(pathname=json_path, recursive=False):
-            with open(file, 'r') as f:
-                raw_obj = json.load(f)
-                self._dataframe.append(DataPreprocessor._js_2_dataframe(raw_obj))
+        for path in glob.glob(pathname=json_path, recursive=False):
+            ticker = os.path.split(path)[-1][:-5].lower()
+            _, df = get_data(ticker=ticker, force_update=False, save=True)
+            self._dataframe.append(df)
         return self
 
+    @utility.log_and_discard_exceptions
     def load_from_csv(self, csv_path: str):
         """
         :param csv_path: csv is a column of ticker strings
@@ -69,19 +67,12 @@ class DataPreprocessor:
         with open(csv_path, "r") as fp:
             cr = csv.reader(fp)
             for line in cr:
-                fname = os.path.join(os.path.join(work_dir, DataPreprocessor._raw_json_folder_name), line[0] + ".json")
-                if not os.path.isfile(fname):
-                    continue
-                with open(fname, 'r') as f:
-                    raw_obj = json.load(f)
-                    self._dataframe.append(DataPreprocessor._js_2_dataframe(raw_obj))
+                ticker = line[0]
+                _, df = get_data(ticker=ticker, force_update=False, save=True)
+                self._dataframe.append(df)
         return self
 
-    @classmethod
-    def _js_2_dataframe(cls, raw_js_obj):
-        _, df = convert_alphavantage_data_to_pandas(raw_js_obj)
-        return df
-
+    @utility.log_and_discard_exceptions
     def load_from_pickle(self):
         with open("x_train.pk", "rb") as fp:
             self._x_train = pk.load(fp)
@@ -94,6 +85,7 @@ class DataPreprocessor:
         self._skip_to_end = True
         return self
 
+    @utility.log_and_discard_exceptions
     def expand(self):
         """
         :return: self
@@ -119,6 +111,7 @@ class DataPreprocessor:
         self._dataframe = new_datat
         return self
 
+    @utility.log_and_discard_exceptions
     def extract_sequence(self,
                          sample_offset=5,
                          input_length=20,
@@ -221,13 +214,19 @@ class DataPreprocessor:
                 elif y == np.nan:
                     logging.error("y = NAN")
                 else:
-                    self._x_train.append(xx)
+                    self._x_train.append(xx.reshape((1, xx.shape[0], xx.shape[1])))
                     self._y_train.append(y)
                     self._date.append(date_now)
                     self._price_now.append(price_now)
 
+        # need to convert the sample as first dimension
+        self._x_train = np.concatenate(tuple(self._x_train))
+        self._y_train = np.array(self._y_train).reshape(-1, 1)
+        self._date = np.array(self._date).reshape(-1, 1)
+        self._price_now = np.array(self._price_now).reshape(-1, 1)
         return self
 
+    @utility.log_and_discard_exceptions
     def split(self, test_size=0.2):
         """
         Split to training and testing
@@ -242,9 +241,10 @@ class DataPreprocessor:
 
         return self
 
+    @utility.log_and_discard_exceptions
     def get(self, save=False, separate_input=False):
         """
-        :param save: save pickle data for faster acess next time
+        :param save: save pickle data for faster access next time
         :param separate_input: used for multiple input pipes
         :return:
         """

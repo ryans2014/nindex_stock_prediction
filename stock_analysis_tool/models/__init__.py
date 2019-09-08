@@ -1,7 +1,5 @@
 import configuration
 
-from .data_processing import get_batch_input_array
 from .data_preprocessor import DataPreprocessor
-
-from .keras_model_utility import get_data, save, load, train, evaluate, plot_history
-from .result_plotting import plot_prediction
+from .keras_model_utility import save, load, train, evaluate, plot_history
+from .result_plotting import plot_prediction_bars

@@ -1,10 +1,10 @@
 import models
 import numpy as np
 import matplotlib.pyplot as plt
-import utility
+from models import DataPreprocessor
 
 
-def plot_prediction(keras_model, ticker="AAPL", num_year=5, threshold=0.03):
+def plot_prediction_bars(keras_model, ticker="AAPL", num_year=5, threshold=0.03):
     """
     :param keras_model: can be the model name ,can be the keras model, can be the function to generate model
     :param ticker: which stock you want to plot
@@ -20,7 +20,12 @@ def plot_prediction(keras_model, ticker="AAPL", num_year=5, threshold=0.03):
     models.load(keras_model)
 
     # get data
-    xx, yy, date, price = next(models.get_batch_input_array(-1, 1, 20, year_cutoff=num_year, single_ticker=ticker))
+    separate_input = hasattr(keras_model, "multi_input")
+    ret = DataPreprocessor().load_from_raw_json(single_ticker=ticker)\
+                            .expand()\
+                            .extract_sequence(sample_offset=1, year_cutoff=num_year)\
+                            .get(separate_input=separate_input)
+    xx, _, yy, _, date, price = ret
 
     # predict and transform (tanh -> percentage -> ratio)
     yp = keras_model.predict(xx)
@@ -30,9 +35,7 @@ def plot_prediction(keras_model, ticker="AAPL", num_year=5, threshold=0.03):
     # change to list and reverse
     date = [i for i in range(len(date))]
     price = price.reshape(-1).tolist()
-    price.reverse()
     predict_change = predict_change.reshape(-1).tolist()
-    predict_change.reverse()
 
     # plot
     plt.plot(date, price, color='k')
@@ -43,3 +46,10 @@ def plot_prediction(keras_model, ticker="AAPL", num_year=5, threshold=0.03):
             plt.arrow(x, y, 0.0, dy, color='b')
         else:
             plt.arrow(x, y, 0.0, dy, color='y')
+
+
+"""
+from models import plot_prediction_bars
+from models.phase2_models.test_iteration3 import lstm_v3_stack
+plot_prediction_bars(lstm_v3_stack, "BA")
+"""
