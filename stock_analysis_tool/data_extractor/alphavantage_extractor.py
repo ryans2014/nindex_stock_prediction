@@ -2,9 +2,10 @@ import requests
 import utility
 from configuration import get_config
 import logging
+from .data_extractor import DataExtractor
 
 
-class AlphavantageExtractor:
+class AlphavantageExtractor(DataExtractor):
 
     _cool_down_time = 60. / get_config("alphavantage", "limit_per_min") + 1.
 
@@ -50,20 +51,9 @@ class AlphavantageExtractor:
         logging.info("Data extraction from remote successful. (%s)" % url)
         return data
 
-    def batch_extract(self, ticker_list: list, get_full_data: bool) -> list:
-        """
-        returns a list of json-type dict object
-        """
-        ret = []
-        for ticker in ticker_list:
-            data = self.extract(ticker, get_full_data)
-            ret.append(data)
-        return ret
-
-    def extract(self, ticker: str, get_full_data: bool) -> dict:
+    def extract(self, ticker: str, get_full_data: bool = True) -> dict:
         """
         returns a json-type dict object
         """
         url = self._get_eod_query_url(ticker, get_full_data)
         return AlphavantageExtractor._get_eod_data(url)
-

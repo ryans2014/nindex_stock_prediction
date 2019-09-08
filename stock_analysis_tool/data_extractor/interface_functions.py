@@ -2,10 +2,31 @@ import utility
 import logging
 import pandas as pd
 import json
+from .alphavantage_extractor import AlphavantageExtractor
+from .cache_extractor import CacheExtractor, CacheWriter
 
 
 @utility.log_and_discard_exceptions
-def convert_alphavantage_data_to_pandas(js_obj):
+def get_data(ticker: str, force_update=False, save=True):
+    """
+    :param ticker: str, ticker name, like "AAPL"
+    :param force_update: bool, if True, force to extract from web source
+    :param save: if save to cache file
+    :return: (str, DataFrame) tuple
+    """
+    ret_obj = {}
+    if not force_update:
+        ret_obj = _cache_extractor.extract(ticker)
+    if ret_obj == {}:
+        ret_obj = _web_extractor.extract(ticker)
+    if save:
+        _cache_writer.write(ticker, ret_obj)
+    if ret_obj == {}:
+        return None, None
+    return _convert_alphavantage_data_to_pandas(ret_obj)
+
+
+def _convert_alphavantage_data_to_pandas(js_obj):
     """
     :param js_obj: json file path string or json dict object
     :return: (ticker string, pandas DataFrame)
@@ -28,3 +49,8 @@ def convert_alphavantage_data_to_pandas(js_obj):
     df.sort_values(by="Date", inplace=True)
     df.reset_index(inplace=True, drop=True)
     return ticker, df
+
+
+_web_extractor = AlphavantageExtractor()
+_cache_extractor = CacheExtractor()
+_cache_writer = CacheWriter()

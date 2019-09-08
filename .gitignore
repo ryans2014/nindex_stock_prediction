@@ -1,13 +1,4 @@
 /stock_analysis_tool.venv
-
 /stock_analysis_tool/.idea
 /stock_analysis_tool/work_dir
-
-/stock_analysis_tool/configuration/__pycache__
-/stock_analysis_tool/data_extractor/__pycache__
-/stock_analysis_tool/scripts/__pycache__
-/stock_analysis_tool/models/__pycache__
-/stock_analysis_tool/models/phase1_models/__pycache__
-/stock_analysis_tool/models/phase2_models/__pycache__
-/stock_analysis_tool/test/__pycache__
-/stock_analysis_tool/utility/__pycache__
+**/__pycache__
