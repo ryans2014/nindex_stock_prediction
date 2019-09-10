@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.axis {
+  font: 10px sans-serif;
+}
+
+.axis-title {
+  text-anchor: end;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.axis--x path {
+  display: none;
+}
+
+.axis--y .tick:not(.tick--one) line {
+  stroke-opacity: .15;
+}
+
+.line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.area {
+  fill-opacity: 0.6;
+}
+
+.area--below {
+  fill: #de77ae;
+}
+
+.area--above {
+  fill: #7fbc41;
+}
+
+</style>
+<body>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script>
+
+var margin = {top: 30, right: 30, bottom: 40, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var formatPercent = d3.format("+.0%"),
+    formatChange = function(x) { return formatPercent(x - 1); },
+    parseDate = d3.time.format("%d-%b-%y").parse;
+
+var x = d3.time.scale()
+    .range([0, width]);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickSize(-width, 0);
+
+var line = d3.svg.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.y0); });
+
+var area = d3.svg.area()
+    .x(function(d) { return x(d.date); })
+    .y1(function(d) { return y(d.y1); })
+    .y0(function(d) { return y(d.y0); });
+
+var area_above = d3.svg.area()
+    .x(function(d) { return x(d.date); })
+    .y1(function(d) { return y(d3.max([d.y1, d.y0])); })
+    .y0(function(d) { return y(d.y0); });
+
+var area_below = d3.svg.area()
+    .x(function(d) { return x(d.date); })
+    .y1(function(d) { return y(d3.min([d.y1, d.y0])); })
+    .y0(function(d) { return y(d.y0); });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var gX = svg.append("g")
+    .attr("class", "axis axis--x")
+    .attr("transform", "translate(0," + height + ")");
+
+var gY = svg.append("g")
+    .attr("class", "axis axis--y");
+
+gY.append("text")
+    .attr("class", "axis-title")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 6)
+    .attr("dy", ".71em")
+    .text("Price");
+
+d3.csv("data.csv")
+    .row(function(d) { return {date: d.date, close: +d.close, predict: +d.predict}; })
+    .get(function(error, rows) {
+        if (error) throw error;
+
+        rows.forEach(function(row) {
+            row.date = parseDate(row.date);
+          });
+
+        rows.forEach(function(row) {
+            row.y0 = row.close;
+            row.y1 = row.close + row.predict;
+        });
+
+        x.domain(d3.extent(rows, function(row) { return row.date; }));
+        y.domain(d3.extent(rows, function(row) { return row.y0; }));
+
+        // Use a second linear scale for ticks.
+        yAxis.tickValues(d3.scale.linear().domain(y.domain()).ticks(20));
+
+        gX.call(xAxis);
+        gY.call(yAxis)
+            .selectAll(".tick")
+            .classed("tick--one", function(d) { return Math.abs(d - 1) < 1e-6; });
+
+        var defs = svg.append("defs");
+
+        svg.append("path")
+            .datum(rows)
+            .attr("clip-path", "url(#clip-above)")
+            .attr("class", "area area--above")
+            .attr("d", area_above);
+
+        svg.append("path")
+            .datum(rows)
+            .attr("clip-path", "url(#clip-below)")
+            .attr("class", "area area--below")
+            .attr("d", area_below);
+
+        svg.append("path")
+            .datum(rows)
+            .attr("class", "line")
+            .attr("d", line);
+    });
+
+</script>
