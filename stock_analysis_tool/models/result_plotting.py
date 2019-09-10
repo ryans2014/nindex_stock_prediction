@@ -1,7 +1,9 @@
 import models
+import csv
 import numpy as np
 import matplotlib.pyplot as plt
 from models import DataPreprocessor
+import utility.date
 
 
 def plot_prediction_bars(keras_model, ticker="AAPL", num_year=5, threshold=0.03):
@@ -33,13 +35,13 @@ def plot_prediction_bars(keras_model, ticker="AAPL", num_year=5, threshold=0.03)
     predict_change = price * yp / 100.0
 
     # change to list and reverse
-    date = [i for i in range(len(date))]
+    date_idx = [i for i in range(len(date))]
     price = price.reshape(-1).tolist()
     predict_change = predict_change.reshape(-1).tolist()
 
     # plot
-    plt.plot(date, price, color='k')
-    for x, y, dy in zip(date, price, predict_change):
+    plt.plot(date_idx, price, color='k')
+    for x, y, dy in zip(date_idx, price, predict_change):
         if dy / y > threshold:
             plt.arrow(x, y, 0.0, dy, color='r')
         elif dy / y < -threshold:
@@ -47,9 +49,20 @@ def plot_prediction_bars(keras_model, ticker="AAPL", num_year=5, threshold=0.03)
         else:
             plt.arrow(x, y, 0.0, dy, color='y')
 
+    # write csv
+    with open('data.csv', 'w', newline='') as fp:
+        csv_writer = csv.writer(fp, delimiter=',')
+        csv_writer.writerow(("date", "close", "predict"))
+        for x, y, dy in zip(date, price, predict_change):
+            x = int(x)
+            y = float(y)
+            dy = float(dy)
+            dt = utility.date.int_to_date(x).strftime("%Y-%m-%d")
+            csv_writer.writerow((dt, y, dy))
+
 
 """
 from models import plot_prediction_bars
 from models.phase2_models.test_iteration3 import lstm_v3_stack
-plot_prediction_bars(lstm_v3_stack, "BA")
+plot_prediction_bars(lstm_v3_stack, "AAPL")
 """
