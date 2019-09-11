@@ -13,6 +13,11 @@ def plot_prediction_bars(keras_model, ticker="AAPL", num_year=5, threshold=0.03)
     :param num_year: how many years do you want to see
     :param threshold: where the arrow color changess
     :return: none
+
+    ------------ To load a single ticker -------------------------
+    from models import plot_prediction_bars
+    from models.phase2_models.test_iteration3 import lstm_v3_stack
+    plot_prediction_bars(lstm_v3_stack, "AAPL")
     """
 
     if type(keras_model).__name__ == "function":
@@ -59,10 +64,3 @@ def plot_prediction_bars(keras_model, ticker="AAPL", num_year=5, threshold=0.03)
             dy = float(dy)
             dt = utility.date.int_to_date(x).strftime("%Y-%m-%d")
             csv_writer.writerow((dt, y, dy))
-
-
-"""
-from models import plot_prediction_bars
-from models.phase2_models.test_iteration3 import lstm_v3_stack
-plot_prediction_bars(lstm_v3_stack, "AAPL")
-"""

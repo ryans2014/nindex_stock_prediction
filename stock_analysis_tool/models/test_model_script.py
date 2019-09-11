@@ -1,8 +1,8 @@
 from models.keras_model_utility import *
 from models import DataPreprocessor
 
-from models.models_version_4 import test_iteration4 as model_functions
-comparison_name = "test_iteration4"
+from models.models_version_4 import p4_1 as model_functions
+comparison_name = "p4_1"
 
 # run all models
 hist_list = []
@@ -20,7 +20,7 @@ for my_model in model_functions:
         separate_x = md1.multi_input
 
     # get data
-    ret = DataPreprocessor().load_from_raw_json()\
+    ret = DataPreprocessor().load_from_pickle()\
                             .expand()\
                             .extract_sequence(year_cutoff=15)\
                             .split()\

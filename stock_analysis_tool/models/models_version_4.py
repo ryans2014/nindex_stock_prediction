@@ -3,7 +3,7 @@ import utility
 
 
 @utility.named_model
-def lstm_v4_stack():
+def p4_1_lstm_stack():
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.LSTM(5, input_shape=(20, 5)))
     model.add(tf.keras.layers.Dense(4, activation='relu'))
@@ -17,7 +17,7 @@ def lstm_v4_stack():
 
 @utility.multi_input_model
 @utility.named_model
-def lstm_v4_stack4_multi_input():
+def p4_2_lstm_stack4_multi_input():
 
     def get_submodel():
         input_ts = tf.keras.layers.Input(shape=(20, 1))
@@ -46,5 +46,5 @@ def lstm_v4_stack4_multi_input():
     return model
 
 
-test_iteration4 = [lstm_v4_stack,
-                   lstm_v4_stack4_multi_input]
+p4_1 = [p4_1_lstm_stack,
+        p4_2_lstm_stack4_multi_input]

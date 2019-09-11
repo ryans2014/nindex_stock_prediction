@@ -1,6 +1,5 @@
 import os
 import glob
-import json
 import math
 import logging
 import csv
@@ -47,6 +46,8 @@ class DataPreprocessor:
             if single_ticker.endswith("json"):
                 single_ticker = single_ticker[:-5]
             _, df = get_data(ticker=single_ticker, force_update=False, save=True)
+            if df is None:
+                return None
             self._dataframe = [df]
             return self
         json_path = os.path.join(os.path.join(os.getcwd(), DataPreprocessor._cache_folder_name), "*.json")
@@ -54,6 +55,8 @@ class DataPreprocessor:
         for path in glob.glob(pathname=json_path, recursive=False):
             ticker = os.path.split(path)[-1][:-5].lower()
             _, df = get_data(ticker=ticker, force_update=False, save=True)
+            if df is None:
+                continue
             self._dataframe.append(df)
         return self
 
@@ -69,6 +72,8 @@ class DataPreprocessor:
             for line in cr:
                 ticker = line[0]
                 _, df = get_data(ticker=ticker, force_update=False, save=True)
+                if df is None:
+                    continue
                 self._dataframe.append(df)
         return self
 
@@ -94,7 +99,7 @@ class DataPreprocessor:
         if self._skip_to_end:
             return self
 
-        new_datat = []
+        new_data = []
         for df in self._dataframe:
             if len(df) < 500:
                 continue
@@ -106,9 +111,9 @@ class DataPreprocessor:
             df["SMA100"] = sma_price[2]
             df["SMA200"] = sma_price[3]
             df.dropna(inplace=True)
-            new_datat.append(df)
+            new_data.append(df)
 
-        self._dataframe = new_datat
+        self._dataframe = new_data
         return self
 
     @utility.log_and_discard_exceptions
@@ -152,7 +157,7 @@ class DataPreprocessor:
                 # daily price
                 start = idx - input_length - 1
                 end = idx
-                close = df["Close"][start:end].values
+                close = df["Close"].iloc[start:end].values
                 close = utility.math_functions.price_to_percentage(close) * 0.25
                 close = np.tanh(close)
 
@@ -160,7 +165,7 @@ class DataPreprocessor:
                 dp_interval = math.ceil(5.0 / dp_per_sma)
                 start = idx - 1 - input_length * dp_interval
                 end = idx
-                sma5 = df["SMA5"][start:end:2].values
+                sma5 = df["SMA5"].iloc[start:end:2].values
                 sma5 = utility.math_functions.price_to_percentage(sma5) * 0.5 / 2.0
                 sma5 = np.tanh(sma5)
 
@@ -168,7 +173,7 @@ class DataPreprocessor:
                 dp_interval = math.ceil(20.0 / dp_per_sma)
                 start = idx - 1 - input_length * dp_interval
                 end = idx
-                sma20 = df["SMA20"][start:end:5].values
+                sma20 = df["SMA20"].iloc[start:end:5].values
                 sma20 = utility.math_functions.price_to_percentage(sma20) / 5.0
                 sma20 = np.tanh(sma20)
 
@@ -176,7 +181,7 @@ class DataPreprocessor:
                 dp_interval = math.ceil(100.0 / dp_per_sma)
                 start = idx - 1 - input_length * dp_interval
                 end = idx
-                sma100 = df["SMA100"][start:end:25].values
+                sma100 = df["SMA100"].iloc[start:end:25].values
                 sma100 = utility.math_functions.price_to_percentage(sma100) * 2.0 / 25.0
                 sma100 = np.tanh(sma100)
 
@@ -184,7 +189,7 @@ class DataPreprocessor:
                 dp_interval = math.ceil(200.0 / dp_per_sma)
                 start = idx - 1 - input_length * dp_interval
                 end = idx
-                sma200 = df["SMA200"][start:end:50].values
+                sma200 = df["SMA200"].iloc[start:end:50].values
                 sma200 = utility.math_functions.price_to_percentage(sma200) * 2.5 / 50.0
                 sma200 = np.tanh(sma200)
 
@@ -198,9 +203,9 @@ class DataPreprocessor:
                 # get target
                 sma20_future = -1.0
                 if idx + 19 < len(df):
-                    sma20_future = df["SMA20"][idx + 19]
-                price_now = df["Close"][idx - 1]
-                date_now = df["Date"][idx - 1]
+                    sma20_future = df["SMA20"].iloc[idx + 19]
+                price_now = df["Close"].iloc[idx - 1]
+                date_now = df["Date"].iloc[idx - 1]
                 y = (sma20_future / price_now - 1.0) * 100.0
 
                 # mapping to around (-2, 2) region
