@@ -1,58 +1,3 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-<style>
-
-.axis {
-  font: 15px sans-serif;
-}
-
-.axis-title {
-  text-anchor: end;
-}
-
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-.axis--x path {
-}
-
-.axis--y .tick:not(.tick--one) line {
-  stroke-opacity: .15;
-}
-
-.line {
-  fill: none;
-  stroke: #000;
-  stroke-width: 2.0px;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
-
-.area {
-}
-
-.area--below {
-  fill: red;
-}
-
-.area--above {
-  fill: green;
-}
-
-</style>
-
-<body>
-  <svg>
-
-  </svg>
-</body>
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<script>
-
 //  DOM main objects
 var margin = {top: 30, right: 30, bottom: 40, left: 50},
     width = 960 - margin.left - margin.right,
@@ -199,5 +144,3 @@ function extend_range(range) {
   range[1] = range[1] + delta / 3;
   return range;
 }
-
-</script>
