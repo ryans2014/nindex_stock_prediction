@@ -136,10 +136,11 @@ class DataPreprocessor:
         # 4 means for 200SMA, time serie points are 50 days apart to each other. For 20SMA, 5 days apart.
         dp_per_sma = 4
 
-        for df in self._dataframe:
+        for i, df in enumerate(self._dataframe):
+            logging.info("extract_sequence %d/%d" % (i, len(df)))
 
             # starting bound
-            starting_bound = input_length * math.ceil(200.0 / dp_per_sma) + 1
+            starting_bound = input_length * math.ceil(200.0 / dp_per_sma) + 200 + 1
             if year_cutoff > 0:
                 starting_bound = max(starting_bound, len(df) - year_cutoff * 253)
 
@@ -165,24 +166,24 @@ class DataPreprocessor:
                 dp_interval = math.ceil(5.0 / dp_per_sma)
                 start = idx - 1 - input_length * dp_interval
                 end = idx
-                sma5 = df["SMA5"].iloc[start:end:2].values
-                sma5 = utility.math_functions.price_to_percentage(sma5) * 0.5 / 2.0
+                sma5 = df["SMA5"].iloc[start:end:dp_interval].values
+                sma5 = utility.math_functions.price_to_percentage(sma5) * 0.5 / dp_interval
                 sma5 = np.tanh(sma5)
 
                 # sma20
                 dp_interval = math.ceil(20.0 / dp_per_sma)
                 start = idx - 1 - input_length * dp_interval
                 end = idx
-                sma20 = df["SMA20"].iloc[start:end:5].values
-                sma20 = utility.math_functions.price_to_percentage(sma20) / 5.0
+                sma20 = df["SMA20"].iloc[start:end:dp_interval].values
+                sma20 = utility.math_functions.price_to_percentage(sma20) / dp_interval
                 sma20 = np.tanh(sma20)
 
                 # sma100
                 dp_interval = math.ceil(100.0 / dp_per_sma)
                 start = idx - 1 - input_length * dp_interval
                 end = idx
-                sma100 = df["SMA100"].iloc[start:end:25].values
-                sma100 = utility.math_functions.price_to_percentage(sma100) * 2.0 / 25.0
+                sma100 = df["SMA100"].iloc[start:end:dp_interval].values
+                sma100 = utility.math_functions.price_to_percentage(sma100) * 2.0 / dp_interval
                 sma100 = np.tanh(sma100)
 
                 # sma200
@@ -190,7 +191,7 @@ class DataPreprocessor:
                 start = idx - 1 - input_length * dp_interval
                 end = idx
                 sma200 = df["SMA200"].iloc[start:end:50].values
-                sma200 = utility.math_functions.price_to_percentage(sma200) * 2.5 / 50.0
+                sma200 = utility.math_functions.price_to_percentage(sma200) * 2.5 / dp_interval
                 sma200 = np.tanh(sma200)
 
                 # combine matrix
@@ -201,9 +202,9 @@ class DataPreprocessor:
                                      sma200.reshape(-1, 1)), axis=1)
 
                 # get target
-                sma20_future = -1.0
-                if idx + 19 < len(df):
-                    sma20_future = df["SMA20"].iloc[idx + 19]
+                if idx + 19 >= len(df):
+                    idx = len(df) - 20
+                sma20_future = df["SMA20"].iloc[idx + 19]
                 price_now = df["Close"].iloc[idx - 1]
                 date_now = df["Date"].iloc[idx - 1]
                 y = (sma20_future / price_now - 1.0) * 100.0

@@ -1,8 +1,8 @@
 from models.keras_model_utility import *
 from models import DataPreprocessor
 
-from models.models_version_4 import p4_1 as model_functions
-comparison_name = "p4_1"
+from models.models_p4_2_cnn import p4_2 as model_functions
+comparison_name = "p4_2"
 
 # run all models
 hist_list = []
@@ -28,7 +28,7 @@ for my_model in model_functions:
     x_train, x_test, y_train, y_test = ret
 
     # train
-    history = train(md1, 1500, x_train, x_test, y_train, y_test)
+    history = train(md1, 500, x_train, x_test, y_train, y_test)
 
     hist_list.append(history)
     model_list.append(md1)

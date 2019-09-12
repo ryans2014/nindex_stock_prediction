@@ -2,6 +2,7 @@ import math
 import numpy as np
 from matplotlib import pyplot as plt
 import utility
+import tensorflow as tf
 
 
 @utility.single_instance_generator
@@ -58,15 +59,15 @@ def load(model):
 
 def train(model, epochs, x_train, x_test, y_train, y_test, save_weight=False):
 
-    # cb1 = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=20)
+    cb1 = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=100)
     history = model.fit(x_train,
                         y_train,
                         epochs=epochs,
-                        batch_size=2000,
+                        batch_size=1000,
                         validation_data=(x_test, y_test),
                         use_multiprocessing=True,
-                        verbose=1)
-    # callbacks=[cb1]
+                        verbose=1,
+                        callbacks=[cb1])
     if save_weight:
         save(model)
     return history

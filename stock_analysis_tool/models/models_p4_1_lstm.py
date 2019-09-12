@@ -15,9 +15,22 @@ def p4_1_lstm_stack():
     return model
 
 
+@utility.named_model
+def p4_1_lstm_stack_mae():
+    model = tf.keras.Sequential()
+    model.add(tf.keras.layers.LSTM(5, input_shape=(20, 5)))
+    model.add(tf.keras.layers.Dense(4, activation='relu'))
+    model.add(tf.keras.layers.Dense(4, activation='relu'))
+    model.add(tf.keras.layers.Dense(1, activation='tanh'))
+    model.compile(optimizer='Adam',
+                  loss='mae',
+                  metrics=['mae', 'mse'])
+    return model
+
+
 @utility.multi_input_model
 @utility.named_model
-def p4_2_lstm_stack4_multi_input():
+def p4_1_lstm_stack4_multi_input():
 
     def get_submodel():
         input_ts = tf.keras.layers.Input(shape=(20, 1))
@@ -47,4 +60,5 @@ def p4_2_lstm_stack4_multi_input():
 
 
 p4_1 = [p4_1_lstm_stack,
-        p4_2_lstm_stack4_multi_input]
+        p4_1_lstm_stack_mae,
+        p4_1_lstm_stack4_multi_input]
