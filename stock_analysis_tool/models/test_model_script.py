@@ -1,8 +1,8 @@
 from models.keras_model_utility import *
 from models import DataPreprocessor
 
-from models.models_p4_2_cnn import p4_2 as model_functions
-comparison_name = "p4_2"
+from models.models_p4_3_best_mixed import p4_3_best_mixed as model_functions
+comparison_name = "p4_3_best_mixed"
 
 # run all models
 hist_list = []
