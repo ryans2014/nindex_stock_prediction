@@ -1,7 +1,10 @@
 //  DOM main objects
-var margin = {top: 30, right: 30, bottom: 40, left: 50},
-    width = 960 - margin.left - margin.right,
-    height = 600 - margin.top - margin.bottom;
+
+var margin = {top: 30, right: 30, bottom: 40, left: 50};
+var width = d3.select(".navbar").node().clientWidth
+var height = width / 960.0 * 600.0
+width = width - margin.left - margin.right,
+height = height - margin.top - margin.bottom;
 
 var svg = d3.select("body").select("svg")
     .attr("width", width + margin.left + margin.right)
@@ -140,7 +143,24 @@ function fit_yaxis() {
 
 function extend_range(range) {
   var delta = range[1] - range[0];
-  range[0] = range[0] - delta / 3;
-  range[1] = range[1] + delta / 3;
+  range[0] = range[0] - delta / 6;
+  range[1] = range[1] + delta / 6;
   return range;
 }
+
+function fit_all() {
+  d3.select(".area--above").attr("d", area_above.y0(function(d) { return y(d.y1); }))
+                         .attr("d", area_above.y1(function(d) { return y(d.y2); }));
+  d3.select(".area--below").attr("d", area_below.y0(function(d) { return y(d.y0); }))
+                         .attr("d", area_below.y1(function(d) { return y(d.y1); }));
+  d3.select(".line").attr("d", line.y(function(d) { return y(d.y1); }));
+  gY.call(yAxis.scale(y));
+  d3.select(".area--above").attr("d", area_above.x(function(d) { return x(d.date); }))
+  d3.select(".area--below").attr("d", area_below.x(function(d) { return x(d.date); }))
+  d3.select(".line").attr("d", line.x(function(d) { return x(d.date); }))
+  gX.call(xAxis.scale(x));
+  x_range = x.domain();
+}
+
+d3.select("#fit_y_axis").on("click", fit_yaxis);
+d3.select("#fit_all").on("click", fit_all);
