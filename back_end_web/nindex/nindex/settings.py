@@ -37,6 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'nindex.apps.home',
+    'nindex.apps.about',
+    'nindex.apps.model',
+    'nindex.apps.result',
 ]
 
 MIDDLEWARE = [
