@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Nindex - Market Prediction </title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Suez+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/master.css' %}">
+    <link rel="shortcut icon" href="{% static 'image/favicon.ico' %}">
+  </head>
+  <body>
+    <div class="container">
+      <nav class="navbar navbar-expand navbar-light bg-light ">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link font-weight-bold text-dark" href="{% url 'home:home_page' %}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link font-weight-bold text-dark" href="{% url 'model:model_page' %}">Model</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link font-weight-bold text-dark" href="https://github.com/ryansu2011/stock_recommender" target="_blank">GitHub</a>
+          </li>
+        </ul>
+        <div class="nav-item">
+          <a class="nav-link font-weight-bold text-dark" href="{% url 'about:about_page' %}">About</a>
+        </div>
+      </nav>
+    </div>
+    <!-- Base template above this line -->
+    {% block body_block%}
+    {% endblock %}
+    <!-- Base template below this line -->
+  </body>
+</html>

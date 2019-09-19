@@ -1,8 +1,8 @@
-from django.conf.urls import url, include
-from .views import
+from django.urls import path
+from .views import about_page
+
+app_name = 'about'
 
 urlpatterns = [
-    url('/', include('nindex.apps.home.urls'), name='home'),
-    url('index/', include('nindex.apps.about.urls'), name='about'),
-    url('home/', include('nindex.apps.model.urls'), name='model'),
+    path('', about_page, name='about_page'),
 ]

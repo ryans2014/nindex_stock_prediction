@@ -1,0 +1,16 @@
+{% extends "nav_bar.html" %}
+{% block body_block %}
+    <div class="container">
+      <div style="height: 100px"></div>
+      <div class="col text-center">
+        <a class="nav-link bottom-align-text logo_large" href="{% url 'home:home_page' %}">Nindex</a>
+      </div>
+      <br>
+      <form class="text-center" action="{% url 'home:home_page' %}" method="post">
+        {% csrf_token %}
+        <input type="text" class="form-control mx-auto col-md-8 col-12 border-dark" name="symbol" placeholder="Enter stock symbol here ...">
+        <p style="color: red">{{ error_message }}</p>
+        <button type="buton" class="btn btn-outline-dark font-weight-bold">Get Prediction</button>
+      </form>
+    </div>
+{% endblock %}

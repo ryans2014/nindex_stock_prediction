@@ -1,0 +1,88 @@
+{% extends "nav_bar.html" %}
+{% load staticfiles %}
+{% block body_block %}
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/svg.css' %}">
+    <div class="container">
+
+      <!-- Basic info -->
+      <div style="height: 50px"></div>
+      <div class="row">
+        <div class="col col-6 text-right regular_text">
+          Symbol:
+        </div>
+        <div class="col col-6 regular_text">
+          {{ symbol_name }}.
+        </div>
+      </div>
+      <div class="row">
+        <div class="col col-6 text-right regular_text">
+          20-days prediction:
+        </div>
+        <div class="col col-6 regular_text">
+          <div class="row">
+            <div class="col col-auto" id="percentage_result">
+                ...
+            </div>
+            <div class="w-100 d-block d-md-none"></div>
+            <div class="col">
+              <a class="text-black-50" style="font-size: 15px" href="#20day">(what does this mean?)</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SVG -->
+      <div style="height: 50px"></div>
+      <div class="text-center">
+        <div class="regular_text">
+          Historycal prediction
+        </div>
+        <br>
+
+        <div class="">
+          <img src="{% static 'image/loading.gif' %}" class="loading_gif">
+          <svg></svg>
+        </div>
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-outline-dark regular_text secondary_text" id="fit_y_axis">Fit Y-Axis</button>
+          <button type="button" class="btn btn-outline-dark regular_text secondary_text" id="fit_all">Fit All</button>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div style="height: 50px"></div>
+      <div class="shadow-none bg-light py-2 px-3">
+        <div class="regular_text text-black-50">
+          FAQ:
+        </div>
+        <div class="secondary_text font-weight-bold text-black-50 pt-3" id="20day">
+          Q - What is 20-day prediction exactly?
+        </div>
+        <div class="secondary_text pl-4">
+          Prediction of the average daily closing price in future 20 trading days.
+          The price is represented by percentage based on the most recent closing price.
+        </div>
+        <div class="secondary_text font-weight-bold text-black-50 pt-3" id="20day">
+          Q - How are these number predicted?
+        </div>
+        <div class="secondary_text pl-4">
+          These predictions are based on numerical models trained by the past 15 years of SP500 stock data.
+          Check <a href="#">model description</a> for details.
+        </div>
+        <div class="secondary_text font-weight-bold text-black-50 pt-3" id="20day">
+          Q - What does the red and green color region mean in the figure?
+        </div>
+        <div class="secondary_text pl-4">
+          These represent historical predictions with this numerical model.
+          To make a prediction for a day in the past, only data before that day is used.
+          A positive 20-day prediction is representd by green while a negative prediction is represented by red.
+          The scale of the green/red region means the predicted price change of the future 20-day average closing price.
+        </div>
+      </div>
+    </div>
+
+    <div style="height: 1000px"></div>
+
+    <script src="{% static 'javascript/svg.js' %}"></script>
+{% endblock %}

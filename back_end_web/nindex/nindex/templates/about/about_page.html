@@ -1,0 +1,28 @@
+{% extends "nav_bar.html" %}
+{% block body_block %}
+    <div class="container">
+      <div style="height: 50px"></div>
+      <div class="row justify-content-center">
+        <div class="col col-md-8 col-12">
+          <div class="regular_text text-center">
+            About this website
+          </div>
+          <div class="secondary_text pt-3">
+            <p>
+              Time sequence prediction is a challenging machine learning topic.
+              Prediction of stock market trend is even harder because the stock price is influenced by unpredictable external events.
+              These unpredictable events add noises to the data.
+              These noises cannot be learned by the machine learning model because they don't have consistent statistical behaviors.
+            </p>
+            <p>
+              This website demonstrates the performance of a <a href="https://github.com/ryansu2011/stock_recommender">project</a>
+              in which machine learning algorithms are ultilized to predict US stock market.</p>
+            <p>
+              This is an ongoing project, which means the numerical model may get updated if study found better data processing method, better model structure, etc.
+              Please see the <a href="{% url 'model:model_page' %}">model</a> page for more information.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}
