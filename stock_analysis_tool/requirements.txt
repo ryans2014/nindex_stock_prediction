@@ -69,3 +69,4 @@ Werkzeug==0.15.6
 wrapt==1.11.2
 requests
 pymongo
+motor

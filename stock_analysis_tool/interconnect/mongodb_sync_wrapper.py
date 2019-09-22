@@ -1,31 +1,6 @@
 import pymongo
-from datetime import datetime, timezone, timedelta
-
-client = pymongo.MongoClient("mongodb+srv://ryansu2011:susu1021@hispredict-dbzhi.mongodb.net/test?retryWrites=true&w=majority")
-db = client.histresult
-collection = db.results
-
-
-def previous_close_utc_time() -> datetime:
-    """
-    :return: previosu trading close time (assume 4:30pm close at EAT) (return tiem is in UTC)
-    """
-    def utc(est: datetime) -> datetime:
-        return est + timedelta(hours=4)
-
-    est_now = datetime.utcnow() - timedelta(hours=4)
-    today_close = datetime(year=est_now.year,
-                           month=est_now.month,
-                           day=est_now.day,
-                           hour=16,
-                           minute=30)
-    if est_now > today_close and est_now.weekday() <= 5:
-        return utc(today_close)
-
-    previous_close = today_close - timedelta(hours=24)
-    while previous_close.weekday() > 5:
-        previous_close = previous_close - timedelta(hours=24)
-    return utc(previous_close)
+from datetime import datetime
+from interconnect.util import previous_close_utc_time
 
 
 class SyncResultDocument:
@@ -63,7 +38,7 @@ class SyncResultDocument:
         return self
 
 
-
-
-
-
+# client = pymongo.MongoClient(
+# "mongodb+srv://ryansu2011:susu1021@hispredict-dbzhi.mongodb.net/test?retryWrites=true&w=majority")
+# db = client.histresult
+# collection = db.results

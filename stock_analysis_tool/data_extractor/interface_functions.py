@@ -6,7 +6,6 @@ from .alphavantage_extractor import AlphavantageExtractor
 from .cache_extractor import CacheExtractor, CacheWriter
 
 
-@utility.log_and_discard_exceptions
 def get_data(ticker: str, force_update=False, save=True):
     """
     :param ticker: str, ticker name, like "AAPL"
