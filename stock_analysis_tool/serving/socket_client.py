@@ -1,5 +1,5 @@
 import socket
-from interconnect.util import prefixed_socket_recv, prefixed_socket_send
+from serving.util import prefixed_socket_recv, prefixed_socket_send
 import threading
 
 """

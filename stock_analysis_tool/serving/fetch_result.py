@@ -1,5 +1,9 @@
 import asyncio
-from interconnect.mongodb_async_wrapper import AsyncResultDocument
+from serving.mongodb_async_wrapper import AsyncResultDocument
+from models import TensorflowProduction
+
+
+tf_production = TensorflowProduction()
 
 
 async def get_result(symbol: str) -> str:
@@ -12,8 +16,8 @@ async def get_result(symbol: str) -> str:
     if not jdoc.need_update_csv():
         return jdoc.get_csv()
 
-    # update by calling the full pipline
-    # call tf server
-    csv_string = ""
+    # update csv by calling the full pipline
+    csv_string = tf_production.predict(symbol, 5)
     jdoc.set_csv(csv_string)
+    await jdoc.push()
     return csv_string

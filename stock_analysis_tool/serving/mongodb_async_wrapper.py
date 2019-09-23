@@ -1,6 +1,6 @@
 from motor import motor_asyncio
 from datetime import datetime
-from interconnect.util import previous_close_utc_time
+from serving.util import previous_close_utc_time
 import asyncio
 
 
@@ -42,7 +42,11 @@ class AsyncResultDocument:
         return self._document["csv"]
 
     async def push(self):
-        await db_collection.update_one({"symbol": self._symbol}, self._document)
+        await db_collection.update_one({"symbol": self._symbol},
+                                       {"$set": {
+                                               "last_update": datetime.utcnow(),
+                                               "model_version": self._document["model_version"],
+                                               "csv": self.get_csv()}})
 
 
 if __name__ == "__main__":

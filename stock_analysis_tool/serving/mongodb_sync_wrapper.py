@@ -1,6 +1,6 @@
 import pymongo
 from datetime import datetime
-from interconnect.util import previous_close_utc_time
+from serving.util import previous_close_utc_time
 
 
 class SyncResultDocument:
@@ -38,7 +38,9 @@ class SyncResultDocument:
         return self
 
 
-# client = pymongo.MongoClient(
-# "mongodb+srv://ryansu2011:susu1021@hispredict-dbzhi.mongodb.net/test?retryWrites=true&w=majority")
-# db = client.histresult
-# collection = db.results
+"""
+client = pymongo.MongoClient(
+"mongodb+srv://ryansu2011:susu1021@hispredict-dbzhi.mongodb.net/test?retryWrites=true&w=majority")
+db = client.histresult
+collection = db.results
+"""

@@ -14,7 +14,7 @@ class CacheExtractor(DataExtractor):
             ticker = ticker + ".json"
         file_path = os.path.join(self._cache_path, ticker.lower())
         if not os.path.isfile(file_path):
-            return {}
+            raise ValueError("Incorrect file path")
         with open(file_path, "r") as fp:
             return json.load(fp)
 

@@ -35,32 +35,30 @@ class DataPreprocessor:
         self._date = []
         self._price_now = []
 
-    @utility.log_and_discard_exceptions
-    def load_from_raw_json(self, single_ticker=None):
+    def load_from_raw_json(self, single_ticker=None, force_update=False, save=True):
         """
         :param single_ticker: str, ticker of the stock you need
+        :param force_update: bool, force to fetch from remote
+        :param save: bool whether to save to json file
         :return:
         """
         if type(single_ticker) is str:
             self._single_ticker_call = True
             if single_ticker.endswith("json"):
                 single_ticker = single_ticker[:-5]
-            _, df = get_data(ticker=single_ticker, force_update=False, save=True)
-            if df is None:
-                return None
+            _, df = get_data(ticker=single_ticker, force_update=force_update, save=save)
             self._dataframe = [df]
             return self
         json_path = os.path.join(os.path.join(os.getcwd(), DataPreprocessor._cache_folder_name), "*.json")
         self._dataframe = []
         for path in glob.glob(pathname=json_path, recursive=False):
             ticker = os.path.split(path)[-1][:-5].lower()
-            _, df = get_data(ticker=ticker, force_update=False, save=True)
+            _, df = get_data(ticker=ticker, force_update=force_update, save=save)
             if df is None:
                 continue
             self._dataframe.append(df)
         return self
 
-    @utility.log_and_discard_exceptions
     def load_from_csv(self, csv_path: str):
         """
         :param csv_path: csv is a column of ticker strings
@@ -77,7 +75,6 @@ class DataPreprocessor:
                 self._dataframe.append(df)
         return self
 
-    @utility.log_and_discard_exceptions
     def load_from_pickle(self):
         with open("x_train.pk", "rb") as fp:
             self._x_train = pk.load(fp)
@@ -90,7 +87,6 @@ class DataPreprocessor:
         self._skip_to_end = True
         return self
 
-    @utility.log_and_discard_exceptions
     def expand(self):
         """
         :return: self
@@ -116,7 +112,6 @@ class DataPreprocessor:
         self._dataframe = new_data
         return self
 
-    @utility.log_and_discard_exceptions
     def extract_sequence(self,
                          sample_offset=5,
                          input_length=20,
@@ -202,9 +197,10 @@ class DataPreprocessor:
                                      sma200.reshape(-1, 1)), axis=1)
 
                 # get target
-                if idx + 19 >= len(df):
-                    idx = len(df) - 20
-                sma20_future = df["SMA20"].iloc[idx + 19]
+                idx_sma20 = idx
+                if idx_sma20 + 19 >= len(df):
+                    idx_sma20 = len(df) - 20
+                sma20_future = df["SMA20"].iloc[idx_sma20 + 19]
                 price_now = df["Close"].iloc[idx - 1]
                 date_now = df["Date"].iloc[idx - 1]
                 y = (sma20_future / price_now - 1.0) * 100.0
@@ -232,7 +228,6 @@ class DataPreprocessor:
         self._price_now = np.array(self._price_now).reshape(-1, 1)
         return self
 
-    @utility.log_and_discard_exceptions
     def split(self, test_size=0.2):
         """
         Split to training and testing
@@ -247,7 +242,6 @@ class DataPreprocessor:
 
         return self
 
-    @utility.log_and_discard_exceptions
     def get(self, save=False, separate_input=False):
         """
         :param save: save pickle data for faster access next time
@@ -270,11 +264,12 @@ class DataPreprocessor:
                              self._x_train[:, :, 2:3],
                              self._x_train[:, :, 3:4],
                              self._x_train[:, :, 4:5]]
-            self._x_test = [self._x_test[:, :, 0:1],
-                            self._x_test[:, :, 1:2],
-                            self._x_test[:, :, 2:3],
-                            self._x_test[:, :, 3:4],
-                            self._x_test[:, :, 4:5]]
+            if not self._single_ticker_call:
+                self._x_test = [self._x_test[:, :, 0:1],
+                                self._x_test[:, :, 1:2],
+                                self._x_test[:, :, 2:3],
+                                self._x_test[:, :, 3:4],
+                                self._x_test[:, :, 4:5]]
 
         if self._single_ticker_call:
             return self._x_train, self._x_test, self._y_train, self._y_test, self._date, self._price_now

@@ -20,8 +20,6 @@ def get_data(ticker: str, force_update=False, save=True):
         ret_obj = _web_extractor.extract(ticker)
     if save:
         _cache_writer.write(ticker, ret_obj)
-    if ret_obj == {}:
-        return None, None
     return _convert_alphavantage_data_to_pandas(ret_obj)
 
 

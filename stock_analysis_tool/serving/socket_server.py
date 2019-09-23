@@ -1,7 +1,7 @@
 import asyncio
 import socket
-from interconnect.util import prefixed_socket_async_recv, prefixed_socket_async_send
-from interconnect.fetch_result import get_result
+from serving.util import prefixed_socket_async_recv, prefixed_socket_async_send
+from serving.fetch_result import get_result
 
 
 num_tasks = 0
