@@ -15,6 +15,7 @@ class AsyncResultDocument:
         self._symbol = symbol.upper()
         self._document = None
         self._need_update = False
+        self._does_not_exist = False
 
     async def fetch(self):
         self._document = await db_collection.find_one({"symbol": self._symbol})
@@ -27,6 +28,7 @@ class AsyncResultDocument:
                               "model_version": "v19.9.0",
                               "csv": ""}
             self._need_update = True
+            self._does_not_exist = True
         elif self._document["last_update"] < previous_close_utc_time():
             self._document["last_update"] = datetime.utcnow()
             self._document["model_version"] = "v19.9.0"
@@ -42,11 +44,14 @@ class AsyncResultDocument:
         return self._document["csv"]
 
     async def push(self):
-        await db_collection.update_one({"symbol": self._symbol},
-                                       {"$set": {
-                                               "last_update": datetime.utcnow(),
-                                               "model_version": self._document["model_version"],
-                                               "csv": self.get_csv()}})
+        if self._does_not_exist:
+            db_collection.insert_one(self._document)
+        else:
+            await db_collection.update_one({"symbol": self._symbol},
+                                           {"$set": {
+                                                   "last_update": datetime.utcnow(),
+                                                   "model_version": self._document["model_version"],
+                                                   "csv": self.get_csv()}})
 
 
 if __name__ == "__main__":

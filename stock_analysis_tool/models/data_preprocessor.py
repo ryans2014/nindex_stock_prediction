@@ -132,7 +132,7 @@ class DataPreprocessor:
         dp_per_sma = 4
 
         for i, df in enumerate(self._dataframe):
-            logging.info("extract_sequence %d/%d" % (i, len(df)))
+            # logging.info("extract_sequence %d/%d" % (i, len(self._dataframe)))
 
             # starting bound
             starting_bound = input_length * math.ceil(200.0 / dp_per_sma) + 200 + 1

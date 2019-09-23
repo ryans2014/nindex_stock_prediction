@@ -1,6 +1,7 @@
 import models
 import csv
 import io
+import logging
 import numpy as np
 from models import DataPreprocessor
 import utility.date
@@ -13,6 +14,7 @@ class TensorflowProduction:
         self._keras_model = deploy_model()
         models.load(self._keras_model)
         self._separate_input = hasattr(self._keras_model, "multi_input")
+        logging.info("TensorflowProduction initiated.")
 
     def predict(self, ticker: str, num_year: int) -> str:
         """
@@ -20,6 +22,8 @@ class TensorflowProduction:
           :param num_year: how many years do you want to see
           :return: none
         """
+        logging.info("TensorflowProduction is now requested to predict %s" % ticker)
+
         # get data
         ret = DataPreprocessor()\
             .load_from_raw_json(single_ticker=ticker, force_update=True, save=False) \

@@ -37,17 +37,18 @@ class AlphavantageExtractor(DataExtractor):
             response = requests.get(url)
         except Exception as excp:
             logging.warning("Exception caught during get method, URL = %s, Exception = %s" % (url, str(excp)))
-            return None
+            raise ValueError("SYMBOL_FETCH_ERROR")
         if response.status_code is not 200:
             logging.warning("Http response status code = %d, URL = %s" % (response.status_code, url))
-            return {}
+            raise ValueError("SYMBOL_FETCH_ERROR")
         data = response.json()
         if "Error Message" in data:
             logging.warning("Http response got error message (%s)" % str(data["Error Message"]))
-            return {}
+            raise ValueError("SYMBOL_FETCH_ERROR")
         if "Time Series (Daily)" not in data or len(data["Time Series (Daily)"]) == 0:
             logging.warning("Http response has zero entries")
-            return {}
+            raise ValueError("SYMBOL_FETCH_ERROR")
+
         logging.info("Data extraction from remote successful. (%s)" % url)
         return data
 
