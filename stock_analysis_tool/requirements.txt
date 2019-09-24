@@ -70,3 +70,4 @@ wrapt==1.11.2
 requests
 pymongo
 motor
+aiohttp

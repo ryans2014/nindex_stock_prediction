@@ -2,6 +2,7 @@ import models
 import csv
 import io
 import logging
+import asyncio
 import numpy as np
 from models import DataPreprocessor
 import utility.date
@@ -16,7 +17,7 @@ class TensorflowProduction:
         self._separate_input = hasattr(self._keras_model, "multi_input")
         logging.info("TensorflowProduction initiated.")
 
-    def predict(self, ticker: str, num_year: int) -> str:
+    async def predict(self, ticker: str, num_year: int) -> str:
         """
           :param ticker: which stock you want to plot
           :param num_year: how many years do you want to see
@@ -25,12 +26,11 @@ class TensorflowProduction:
         logging.info("TensorflowProduction is now requested to predict %s" % ticker)
 
         # get data
-        ret = DataPreprocessor()\
-            .load_from_raw_json(single_ticker=ticker, force_update=True, save=False) \
-            .expand() \
+        ret = DataPreprocessor()
+        ret = await ret.load_from_raw_json_async(single_ticker=ticker)
+        ret = ret.expand()\
             .extract_sequence(sample_offset=1, year_cutoff=num_year) \
             .get(separate_input=self._separate_input)
-
         xx, _, yy, _, date, price = ret
 
         # predict and transform (tanh -> percentage -> ratio)

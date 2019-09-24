@@ -2,6 +2,7 @@ import utility
 import logging
 import pandas as pd
 import json
+import asyncio
 from .alphavantage_extractor import AlphavantageExtractor
 from .cache_extractor import CacheExtractor, CacheWriter
 
@@ -20,6 +21,15 @@ def get_data(ticker: str, force_update=False, save=True):
         ret_obj = _web_extractor.extract(ticker)
     if save:
         _cache_writer.write(ticker, ret_obj)
+    return _convert_alphavantage_data_to_pandas(ret_obj)
+
+
+async def get_data_async(ticker: str):
+    """
+    :param ticker: str, ticker name, like "AAPL"
+    :return: (str, DataFrame) tuple
+    """
+    ret_obj = await _web_extractor.extract_async(ticker)
     return _convert_alphavantage_data_to_pandas(ret_obj)
 
 

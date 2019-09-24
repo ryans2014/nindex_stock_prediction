@@ -6,7 +6,8 @@ import csv
 import numpy as np
 import utility
 import pickle as pk
-from data_extractor import get_data
+import asyncio
+from data_extractor import get_data, get_data_async
 from sklearn.model_selection import train_test_split
 
 
@@ -54,6 +55,28 @@ class DataPreprocessor:
         for path in glob.glob(pathname=json_path, recursive=False):
             ticker = os.path.split(path)[-1][:-5].lower()
             _, df = get_data(ticker=ticker, force_update=force_update, save=save)
+            if df is None:
+                continue
+            self._dataframe.append(df)
+        return self
+
+    async def load_from_raw_json_async(self, single_ticker):
+        """
+        :param single_ticker: str, ticker of the stock you need
+        :return:
+        """
+        if type(single_ticker) is str:
+            self._single_ticker_call = True
+            if single_ticker.endswith("json"):
+                single_ticker = single_ticker[:-5]
+            _, df = await get_data_async(ticker=single_ticker)
+            self._dataframe = [df]
+            return self
+        json_path = os.path.join(os.path.join(os.getcwd(), DataPreprocessor._cache_folder_name), "*.json")
+        self._dataframe = []
+        for path in glob.glob(pathname=json_path, recursive=False):
+            ticker = os.path.split(path)[-1][:-5].lower()
+            _, df = await get_data_async(ticker=ticker)
             if df is None:
                 continue
             self._dataframe.append(df)

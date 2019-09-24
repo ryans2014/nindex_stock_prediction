@@ -17,7 +17,7 @@ async def get_result(symbol: str) -> str:
         return jdoc.get_csv()
 
     # update csv by calling the full pipline
-    csv_string = tf_production.predict(symbol, 5)
+    csv_string = await tf_production.predict(symbol, 5)
     jdoc.set_csv(csv_string)
     await jdoc.push()
     return csv_string

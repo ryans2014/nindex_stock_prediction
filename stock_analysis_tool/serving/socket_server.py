@@ -27,7 +27,8 @@ async def request_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWr
         symbol = await prefixed_socket_async_recv(reader)
         logging.info("In request_handler, handle task %s." % symbol)
         csv_string = await get_result(symbol)
-    except:
+    except Exception as e:
+        logging.error(e)
         csv_string = "ERROR"
     await prefixed_socket_async_send(writer, csv_string)
     writer.close()

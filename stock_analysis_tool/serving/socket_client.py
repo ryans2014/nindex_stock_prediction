@@ -18,6 +18,7 @@ def request(symbol: str):
     skt.close()
 
 
+
 if __name__ == "__main__":
     t1 = threading.Thread(target=request, args=("B1",))
     t2 = threading.Thread(target=request, args=("B2",))
