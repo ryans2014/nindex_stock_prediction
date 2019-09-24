@@ -2,3 +2,5 @@
 **/.idea
 /stock_analysis_tool/work_dir_research
 **/__pycache__
+**/migrations
+**/db.sqlite3
