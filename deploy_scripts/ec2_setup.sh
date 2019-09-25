@@ -44,8 +44,8 @@ sudo gunicorn nindex.wsgi &
 
 # start tf-serve aiohttp server
 cd ~
-cd stock_recommender
-sudo python3 stock_analysis_tool.serving.main &
+cd stock_recommender/stock_analysis_tool
+sudo python3 -m serving.http_server_async &
 
 # start nginx web server
 sudo nginx &

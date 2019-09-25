@@ -7,6 +7,14 @@ import asyncio
 db_collection = None
 
 
+def connect():
+    global db_collection
+    clnt = motor_asyncio.AsyncIOMotorClient(
+        "mongodb+srv://ryansu2011:susu1021@hispredict-dbzhi.mongodb.net/test?retryWrites=true&w=majority")
+    dbs = clnt.histresult
+    db_collection = dbs.results
+
+
 class AsyncResultDocument:
     def __init__(self, symbol: str):
         """

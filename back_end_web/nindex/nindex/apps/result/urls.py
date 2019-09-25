@@ -5,5 +5,5 @@ app_name = 'result'
 
 urlpatterns = [
     path('<symbol_name>/', result_page, name='result_page'),
-    path('<symbol_name>/csv/', result_csv, name='result_csv'),
+    path('csv/<symbol_name>/', result_csv, name='result_csv'),
 ]
