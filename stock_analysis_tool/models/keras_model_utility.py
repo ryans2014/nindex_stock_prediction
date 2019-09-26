@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import utility
 import tensorflow as tf
+import os
 
 
 @utility.single_instance_generator
@@ -40,7 +41,7 @@ def save(model, save_model=False):
     """
     Save weight parameters with model name (from model.cname, set by @named_model decorator)
     """
-    weight_file = "model_weights\\" + model.cname
+    weight_file = os.path.join(os.path.join(os.getcwd(), "model_weights"), model.cname)
     model.save_weights(weight_file)
     if save_model:
         model_file = weight_file + ".h5"
@@ -52,7 +53,7 @@ def load(model):
     """
     Load weight parameters from file (file name is from model.cname, set by @named_model decorator)
     """
-    weight_file = "model_weights\\" + model.cname
+    weight_file = os.path.join(os.path.join(os.getcwd(), "model_weights"), model.cname)
     model.load_weights(weight_file)
     return model
 

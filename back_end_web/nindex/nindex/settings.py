@@ -21,12 +21,12 @@ STATIC_DIR = os.path.join(os.path.join(BASE_DIR, 'nindex'), 'statics')
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '6g)&)+i!dutb32!s%exdzm-oz2sv8+g8em^l9$b@d3y8e8u)x)'
+SECRET_KEY = '53c0a$t=6w$^7np7k!1ey2=#=q@2p&8&5t@-&i%fvb@*q0g#*='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['18.191.170.241']
 
 
 # Application definition
@@ -122,5 +122,5 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/statics/'
 STATICFILES_DIRS = [STATIC_DIR]

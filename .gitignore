@@ -2,4 +2,5 @@
 **/.idea
 /stock_analysis_tool/work_dir_research
 **/__pycache__
-**/db.sqlite3
+*.sqlite3
+*.logging
