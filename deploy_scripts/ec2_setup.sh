@@ -12,6 +12,7 @@ sudo yum install git-core.x86_64
 sudo amazon-linux-extras install nginx1
 
 # install python packages
+pip3 install --user --upgrade pip
 pip3 install --user aiohttp==3.6.1
 pip3 install --user Django==2.1
 pip3 install --user dnspython==1.16.0
@@ -22,7 +23,7 @@ pip3 install --user requests==2.22.0
 pip3 install --user numpy==1.16.4
 pip3 install --user pandas==0.24.2
 pip3 install --user sklearn==0.0
-pip3 install --user tensorflow==2.0.0rc0
+pip3 install --user tensorflow==2.0.0-rc1
 
 # User specific aliases and functions
 alias ngconfig="vim /etc/nginx/nginx.conf"
@@ -40,7 +41,7 @@ git clone "https://github.com/ryansu2011/stock_recommender.git"
 # start gunicorn and django
 cd ~
 cd stock_recommender/back_end_web/nindex
-sudo gunicorn nindex.wsgi &
+gunicorn nindex.wsgi &
 
 # start tf-serve aiohttp server
 cd ~
@@ -52,3 +53,9 @@ sudo nginx &
 
 # to quit nginx
 nginx -s quit
+
+# screen operation
+screen -S tfserve
+# Ctrl + A -> D
+screen -ls
+screen -r tfserve
