@@ -74,7 +74,7 @@ xhttp.onreadystatechange = function() {
         var cg = data[data.length - 1].predict  / data[data.length - 1].close * 100;
         cg = String(cg).slice(0,4) + "%"
         if (cg[0] != "-") {
-            cg = "-" + cg;
+            cg = "+" + cg;
         }
         d3.select("#percentage_result").text(cg);
 
