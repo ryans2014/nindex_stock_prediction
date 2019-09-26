@@ -59,7 +59,6 @@ var data = [];
 
 
 // get csv string and process
-var csv_string = ""
 var xhttp = new XMLHttpRequest();
 xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
@@ -72,7 +71,7 @@ xhttp.onreadystatechange = function() {
         d3.select(".loading_gif").attr("src","")
 
         // insert prediction
-        var cg = data[data.lenth - 1].predict  / data[data.lenth - 1].close * 100;
+        var cg = data[data.length - 1].predict  / data[data.length - 1].close * 100;
         d3.select("#percentage_result").text(String(cg).slice(0,5));
 
 	// process data
@@ -128,6 +127,7 @@ xhttp.onreadystatechange = function() {
 
     }
 };
+
 var url = window.location.href;
 url = url.replace("result", "result/csv");
 if (url.slice(-1) == "/") {
@@ -135,7 +135,6 @@ if (url.slice(-1) == "/") {
 }
 xhttp.open("GET", url, true);
 xhttp.send();
-
 
 function zoomed_xaxis() {
     var t = d3.event.transform, xt = t.rescaleX(x);

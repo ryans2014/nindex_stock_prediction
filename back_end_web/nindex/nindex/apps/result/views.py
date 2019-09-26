@@ -21,7 +21,7 @@ def result_page(request, symbol_name: str):
 
 
 def result_csv(request, symbol_name):
-    time.sleep(3)
+    return HttpResponse("app_routing_error", status=400)
 
     # validate ticker name
     ticker_validity = True
