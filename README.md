@@ -1,1 +1,1 @@
-# stock_recommender
+# nindex_stock_prediction
