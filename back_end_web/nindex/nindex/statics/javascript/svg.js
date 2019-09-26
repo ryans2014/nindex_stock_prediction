@@ -70,6 +70,13 @@ xhttp.onreadystatechange = function() {
         // remove loading_gif
         d3.select(".loading_gif").attr("src","")
 
+        // check error
+        if (rows.length < 10) {
+            d3.select("#svg_place_holder").attr("src","Error loading stock prediction. Please check if the entered stock symbol is valid.")
+            d3.select("#percentage_result").text("Unavailable ..");
+            return;
+        }
+
         // insert prediction
         var cg = data[data.length - 1].predict  / data[data.length - 1].close * 100;
         cg = String(cg).slice(0,4) + "%"
