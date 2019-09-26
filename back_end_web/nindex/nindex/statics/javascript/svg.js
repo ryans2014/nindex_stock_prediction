@@ -57,15 +57,25 @@ var area_below = d3.area()
 var x_range = [];
 var data = [];
 
-// read data and make plots
-d3.csv("csv")
-    .row(function(d) { return {date: d.date, close: +d.close, predict: +d.predict}; })
-    .get(function(error, rows) {
-        if (error) throw error;
+
+// get csv string and process
+var csv_string = ""
+var xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        var csv_string = xhttp.responseText;
+        // read data and make plots
+        var rows = d3.csvParse(csv_string, function(d) { return {date: d.date, close: +d.close, predict: +d.predict}; });
         data = rows;
+
         // remove loading_gif
         d3.select(".loading_gif").attr("src","")
-        // process data
+
+        // insert prediction
+        var cg = data[data.lenth - 1].predict  / data[data.lenth - 1].close * 100;
+        d3.select("#percentage_result").text(String(cg).slice(0,5));
+
+	// process data
         rows.forEach(function(row) {
             row.date = parseDate(row.date);
         });
@@ -116,7 +126,16 @@ d3.csv("csv")
             .scale(width / (x(d1) - x(d0)))
             .translate(-x(d0), 0));
 
-    });
+    }
+};
+var url = window.location.href;
+url = url.replace("result", "result/csv");
+if (url.slice(-1) == "/") {
+	url = url.slice(0, url.length - 1);
+}
+xhttp.open("GET", url, true);
+xhttp.send();
+
 
 function zoomed_xaxis() {
     var t = d3.event.transform, xt = t.rescaleX(x);
@@ -140,24 +159,24 @@ function fit_yaxis() {
 }
 
 function extend_range(range) {
-  var delta = range[1] - range[0];
-  range[0] = range[0] - delta / 6;
-  range[1] = range[1] + delta / 6;
-  return range;
+    var delta = range[1] - range[0];
+    range[0] = range[0] - delta / 6;
+    range[1] = range[1] + delta / 6;
+    return range;
 }
 
 function fit_all() {
-  d3.select(".area--above").attr("d", area_above.y0(function(d) { return y(d.y1); }))
+    d3.select(".area--above").attr("d", area_above.y0(function(d) { return y(d.y1); }))
                          .attr("d", area_above.y1(function(d) { return y(d.y2); }));
-  d3.select(".area--below").attr("d", area_below.y0(function(d) { return y(d.y0); }))
+    d3.select(".area--below").attr("d", area_below.y0(function(d) { return y(d.y0); }))
                          .attr("d", area_below.y1(function(d) { return y(d.y1); }));
-  d3.select(".line").attr("d", line.y(function(d) { return y(d.y1); }));
-  gY.call(yAxis.scale(y));
-  d3.select(".area--above").attr("d", area_above.x(function(d) { return x(d.date); }))
-  d3.select(".area--below").attr("d", area_below.x(function(d) { return x(d.date); }))
-  d3.select(".line").attr("d", line.x(function(d) { return x(d.date); }))
-  gX.call(xAxis.scale(x));
-  x_range = x.domain();
+    d3.select(".line").attr("d", line.y(function(d) { return y(d.y1); }));
+    gY.call(yAxis.scale(y));
+    d3.select(".area--above").attr("d", area_above.x(function(d) { return x(d.date); }))
+    d3.select(".area--below").attr("d", area_below.x(function(d) { return x(d.date); }))
+    d3.select(".line").attr("d", line.x(function(d) { return x(d.date); }))
+    gX.call(xAxis.scale(x));
+    x_range = x.domain();
 }
 
 d3.select("#fit_y_axis").on("click", fit_yaxis);

@@ -30,7 +30,7 @@ def run_http_server():
     connect()
     # run http server
     app = web.Application()
-    app.add_routes([web.get('/', http_request_handler), web.get('/csv/{symbol}', http_request_handler)])
+    app.add_routes([web.get('/', http_request_handler), web.get('/result/csv/{symbol}', http_request_handler)])
     web.run_app(app)
 
 
