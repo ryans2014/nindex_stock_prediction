@@ -72,7 +72,11 @@ xhttp.onreadystatechange = function() {
 
         // insert prediction
         var cg = data[data.length - 1].predict  / data[data.length - 1].close * 100;
-        d3.select("#percentage_result").text(String(cg).slice(0,5));
+        cg = String(cg).slice(0,4) + "%"
+        if (cg[0] != "-") {
+            cg = "-" + cg;
+        }
+        d3.select("#percentage_result").text(cg);
 
 	// process data
         rows.forEach(function(row) {
