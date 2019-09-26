@@ -72,7 +72,7 @@ xhttp.onreadystatechange = function() {
 
         // check error
         if (rows.length < 10) {
-            d3.select("#svg_place_holder").attr("src","Error loading stock prediction. Please check if the entered stock symbol is valid.")
+            d3.select("#svg_place_holder").text("Error loading stock prediction. Please check if the entered stock symbol is valid.")
             d3.select("#percentage_result").text("Unavailable ..");
             return;
         }
