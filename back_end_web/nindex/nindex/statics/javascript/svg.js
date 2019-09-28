@@ -173,8 +173,8 @@ function fit_yaxis() {
 
 function extend_range(range) {
     var delta = range[1] - range[0];
-    range[0] = range[0] - delta / 6;
-    range[1] = range[1] + delta / 6;
+    range[0] = range[0] - delta / 25;
+    range[1] = range[1] + delta / 25;
     return range;
 }
 
