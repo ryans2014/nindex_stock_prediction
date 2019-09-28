@@ -1,5 +1,8 @@
 var margin = {top: 30, right: 30, bottom: 40, left: 50};
-var width = d3.select(".navbar").node().clientWidth;
+var width = d3.select(".navbar").node().clientWidth * 0.8;
+if (screen.width * 1.2 < screen.height) {
+	width = d3.select(".navbar").node().clientWidth;
+}
 var height = width / 960.0 * 600.0
 width = width - margin.left - margin.right,
 height = height - margin.top - margin.bottom;
